@@ -4,7 +4,7 @@
 
 - 引入 openlayer3 的css 文件和 js文件
 - 引入 ldMap.css popup.css
-- 引入 olMa.js文件
+- 引入 olMap.js文件
 
 ## 页面结构
 ```
