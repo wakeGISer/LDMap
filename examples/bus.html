@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../js/ol4-debug.js"></script>
+    <script src="../js/ldMap.js"></script>
+    <link rel="stylesheet" href="../css/ol.css">
+    <link rel="stylesheet" href="../css/ldMap.css">
+    <link rel="stylesheet" href="../css/popup.css">
+</head>
+<body>
+<div id="map"></div>
+<div id="panel"></div>
+<script>
+    var raster = new ol.layer.Tile({
+        source: new ol.source.OSM()
+    });
+    var map = new ol.Map({
+        layers: [raster],
+        target: 'map',
+        view: new ol.View({
+            center: [116.39362, 39.92435],
+            projection: 'EPSG:4326',
+            zoom: 12
+        })
+    });
+
+    var bus =  new L.Busline({
+        map: map,
+        panel: "panel"
+    });
+
+    bus.search([116.33357,39.97644],[116.37245,39.91134])
+
+
+    //    alert(feature.getStyle().getWidth());
+</script>
+</body>
+</html>
