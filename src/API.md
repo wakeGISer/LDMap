@@ -6,4 +6,4 @@
 
 - 可视化
 
-- [轨迹](https://wakegiser.github.io/LDMap/src/trace/Trace.md)
+- [轨迹](https://github.com/wakeGISer/LDMap/blob/master/src/trace/Trace.md)
