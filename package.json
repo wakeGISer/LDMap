@@ -1,0 +1,35 @@
+{
+  "name": "scss_sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --inline"
+  },
+  "author": "wakeGIS",
+  "license": "ISC",
+  "dependencies": {
+    "keycode": "^2.1.8",
+    "lodash": "^4.17.4",
+    "vue": "^2.2.3"
+  },
+  "devDependencies": {
+    "autoprefixer-loader": "^3.2.0",
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.2.1",
+    "babel-preset-es2015": "^6.22.0",
+    "css-loader": "^0.27.2",
+    "file-loader": "^0.10.1",
+    "service-mocker": "^1.1.0",
+    "style-loader": "^0.13.2",
+    "url-loader": "^0.5.8",
+    "vue-loader": "^11.3.4",
+    "vue-style-loader": "^2.0.3",
+    "vue-template-compiler": "^2.2.3",
+    "webpack": "^2.2.1",
+    "webpack-dev-server": "^2.4.1"
+  }
+}

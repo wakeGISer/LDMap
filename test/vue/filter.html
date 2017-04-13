@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../../node_modules/vue/dist/vue.js"></script>
+</head>
+<body>
+<div id="app">
+    {{   'hello world' | indexss  }}
+</div>
+<script>
+    var p =  new Vue({
+        el: "#app",
+        data: {
+            dataMsg : [1,2]
+        },
+        filters: {
+            indexss: function (num) {
+                console.log(num);
+                return "hello 2" + num
+            }
+        }
+    })
+</script>
+</body>
+</html>
