@@ -3,13 +3,13 @@
 
 ## 示例
 
-  [公交](https://github.com/wakeGISer/LDMap/examples/bus.html)
+  [公交](https://wakegiser.github.io/LDMap/examples/bus.html)
 
-  [自驾](https://github.com/wakeGISer/LDMap/examples/car.html)
+  [自驾](https://wakegiser.github.io/LDMap/examples/car.html)
 
 
 ## 相关文档
-  [API 参考](https://github.com/wakeGISer/LDMap/src/API.md)
+  [API 参考](https://wakegiser.github.io/LDMap/src/API.md)
   
 ## 支持环境
  ldMap 以来ol3 使用canvas开发，支持现在被称为“现代”浏览器, 通常兼容除了IE8及IE以下版本的其他大部分浏览器。
