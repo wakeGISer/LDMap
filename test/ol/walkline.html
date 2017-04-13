@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../../src/ol3api/js/ol4-debug.js"></script>
+    <!--<script src="../js/olbus.js"></script>-->
+    <link rel="stylesheet" href="../../assets/css/ol.css">
+    <link rel="stylesheet" href="../../assets/css/ldMap.css">
+</head>
+<body>
+<div id="map"></div>
+<script>
+    var raster = new ol.layer.Tile({
+        source: new ol.source.OSM()
+    });
+    var map = new ol.Map({
+        layers: [raster],
+        target: 'map',
+        view: new ol.View({
+            projection: 'EPSG:4326',
+            center: [116.333472, 39.97643],
+            zoom: 14
+        })
+    });
+    var style = new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: '#AFAFAF',
+            width: 3.5
+        })
+    });
+    var vector = new ol.layer.Vector({
+        source: new ol.source.Vector(),
+        style: style
+    });
+    map.addLayer(vector);
+
+    var feature = new ol.Feature(new ol.geom.LineString([[116.333472, 39.97643], [116.332328, 39.976393333333334], [116.331992, 39.97637666666667], [116.33124, 39.976366666666664], [116.32956, 39.97632], [116.328808, 39.97628666666667], [116.328512, 39.97628666666667]]));
+    //    feature.setStyle(style);
+
+    vector.getSource().addFeature(feature);
+
+    var extent = feature.getGeometry().getExtent();
+    var view = map.getView();
+    view.fit(extent, {
+        size: map.getSize(),
+        duration: 2000,
+        easing: ol.easing.inAndOut
+    });
+    //    view.setExtent(extent);
+</script>
+</body>
+</html>
