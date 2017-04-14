@@ -10577,20 +10577,23 @@ var _Carline = __webpack_require__(31);
 
 var _Carline2 = _interopRequireDefault(_Carline);
 
+var _Walkline = __webpack_require__(96);
+
+var _Walkline2 = _interopRequireDefault(_Walkline);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // import ol from './src/ol3api/js/ol';
 
-/**
- * Created by wake on 2017/4/7/007.
- */
-
 var L = {
   version: '1.0.0'
-};
+}; /**
+    * Created by wake on 2017/4/7/007.
+    */
 
 L.Busline = _Busline2.default;
 L.Carline = _Carline2.default;
+L.Walkline = _Walkline2.default;
 
 //console.log(Busline);
 //module.exports = L;
@@ -11181,34 +11184,6 @@ BaseRoute.prototype._fly2Geometry = function (geometry) {
     });
 };
 
-function flyTo(location, done) {
-    var duration = 2000;
-    var zoom = view.getZoom();
-    var parts = 2;
-    var called = false;
-    function callback(complete) {
-        --parts;
-        if (called) {
-            return;
-        }
-        if (parts === 0 || !complete) {
-            called = true;
-            done(complete);
-        }
-    }
-    view.animate({
-        center: location,
-        duration: duration
-    }, callback);
-    view.animate({
-        zoom: zoom - 1,
-        duration: duration / 2
-    }, {
-        zoom: zoom,
-        duration: duration / 2
-    }, callback);
-}
-
 exports.default = BaseRoute;
 
 /***/ }),
@@ -11224,7 +11199,9 @@ exports.__esModule = true;
  */
 
 exports.default = {
-    routeCarUrl: "http://api.ishowchina.com/v3/route/car?",
+    routeBusUrl: "http://api.ishowchina.com/v3/route/bus?",
+    routeCarUrl: "http://api.ishowchina.com/v3/route/car?", // 服务api地址
+    routeWalkUrl: "http://api.ishowchina.com/v3/route/walk?",
     ak: "ak=ec85d3648154874552835438ac6a02b2",
     version: "v=3.4.3",
     STATIC_URL: "http://webapi.ishowchina.com/jsmap/3.4.3/"
@@ -11328,7 +11305,7 @@ exports.default = {
         7: { message: '左转', backgroundPosition: '-293px -73px' },
         8: { message: '左前方转弯', backgroundPosition: '-285px -340px' },
         9: { message: '左侧', backgroundPosition: '' },
-        10: { message: '右侧', backgroundPosition: '' },
+        10: { message: '右侧', backgroundPosition: '-302px -340px' },
         11: { message: '分歧-左', backgroundPosition: '' },
         12: { message: '分歧中央', backgroundPosition: '' },
         13: { message: '分歧右', backgroundPosition: '' },
@@ -31791,6 +31768,734 @@ module.exports = function(module) {
 	return module;
 };
 
+
+/***/ }),
+/* 96 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _getIterator2 = __webpack_require__(18);
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+var _create = __webpack_require__(43);
+
+var _create2 = _interopRequireDefault(_create);
+
+var _bus = __webpack_require__(3);
+
+var _bus2 = _interopRequireDefault(_bus);
+
+var _vue = __webpack_require__(16);
+
+var _vue2 = _interopRequireDefault(_vue);
+
+var _walk = __webpack_require__(99);
+
+var _walk2 = _interopRequireDefault(_walk);
+
+var _restConfig = __webpack_require__(40);
+
+var _restConfig2 = _interopRequireDefault(_restConfig);
+
+var _BaseRoute = __webpack_require__(39);
+
+var _BaseRoute2 = _interopRequireDefault(_BaseRoute);
+
+var _WalklineParse = __webpack_require__(98);
+
+var _WalklineParse2 = _interopRequireDefault(_WalklineParse);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by wake on 2017/4/7/007.
+ */
+
+Walkline.prototype = (0, _create2.default)(_BaseRoute2.default.prototype);
+
+function Walkline(options) {
+    _BaseRoute2.default.call(this, options);
+    this._transferUrl = _restConfig2.default.routeWalkUrl + _restConfig2.default.ak;
+    this.walkLayer = new ol.layer.Vector({
+        source: new ol.source.Vector(),
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: '#0066FF',
+                width: 5
+            })
+        })
+    });
+    this._map.addLayer(this.walkLayer);
+    this._setSelect();
+}
+
+Walkline.prototype._initPanel = function () {
+    var self = this;
+    var el = this._panel;
+    var route = _WalklineParse2.default.parse(this._responseData);
+    "string" == typeof this._panel && (this._panel = document.getElementById(this._panel));
+    this._panel.innerHTML = "<app-Walk v-bind:data-msg='dataMsg' ></app-Walk>";
+    this._app = new _vue2.default({
+        el: '#' + el,
+        data: {
+            dataMsg: route
+        },
+        components: {
+            appWalk: _walk2.default
+        }
+    });
+    _bus2.default.$on('moveTo', this._moveTo.bind(self));
+    this._draw(route);
+};
+
+Walkline.prototype._draw = function (route) {
+    if (route) {
+        this.clearLayer();
+        this._redraw(route);
+    }
+};
+
+Walkline.prototype._redraw = function (route) {
+    var aStyles = this._getPasspoiStyle(route);
+    this._drawIcon(aStyles);
+    var walkFeatures = [];
+    for (var _iterator = route.steps, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : (0, _getIterator3.default)(_iterator);;) {
+        var _ref;
+
+        if (_isArray) {
+            if (_i >= _iterator.length) break;
+            _ref = _iterator[_i++];
+        } else {
+            _i = _iterator.next();
+            if (_i.done) break;
+            _ref = _i.value;
+        }
+
+        var step = _ref;
+
+        var geometry = new ol.geom.LineString(step.path);
+        var walkFeature = new ol.Feature({
+            geometry: geometry
+        });
+        step.geometry = geometry;
+        walkFeature.setProperties({ step: step });
+        walkFeatures.push(walkFeature);
+    }
+    this.walkLayer.getSource().addFeatures(walkFeatures);
+};
+
+Walkline.prototype._setSelect = function () {
+    var self = this;
+    var selectWalk = new ol.interaction.Select({
+        condition: ol.events.condition.click,
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: "#0ae6fb",
+                lineDash: [8],
+                width: 5
+            })
+        }),
+        filter: function filter(feature, layer) {
+            return layer == self.walkLayer;
+        }
+    });
+    this._addInteraction([selectWalk]);
+};
+
+Walkline.prototype.clearLayer = function () {
+    this.walkLayer.getSource().clear();
+    this.iconLayer.getSource().clear();
+};
+
+Walkline.prototype._getPasspoiStyle = function (route) {
+    var passStyles = [];
+    passStyles.push({
+        point: route.start,
+        image: new ol.style.Icon({
+            src: 'http://webapi.ishowchina.com/jsmap/3.4.3/images/point_1.png', // //../../assets/img/start.png
+            anchor: [0.5, 1],
+            // imgSize: [24, 38], // 203 380
+            size: [35, 30],
+            offset: [367, 0]
+        })
+    });
+    passStyles.push({
+        point: route.end,
+        image: new ol.style.Icon({
+            src: 'http://webapi.ishowchina.com/jsmap/3.4.3/images/point_1.png', // //../../assets/img/start.png
+            anchor: [0.5, 1],
+            size: [35, 30],
+            offset: [401, 0]
+        })
+    });
+    return passStyles;
+};
+
+Walkline.prototype._moveTo = function (step) {
+    var geometry = step.geometry;
+    this._fly2Geometry(geometry);
+};
+
+exports.default = Walkline;
+
+/***/ }),
+/* 97 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _panelWalk = __webpack_require__(104);
+
+var _panelWalk2 = _interopRequireDefault(_panelWalk);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+    props: ["dataMsg"],
+    data: function data() {
+        return {
+            routes: this.dataMsg
+        };
+    },
+    mounted: function mounted() {},
+
+    components: {
+        panelWalk: _panelWalk2.default
+    }
+}; //
+//
+//
+//
+//
+//
+//
+
+/***/ }),
+/* 98 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _getIterator2 = __webpack_require__(18);
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by Administrator on 2017/4/14/014.
+ */
+
+exports.default = {
+    parse: function parse(data) {
+        var self = this;
+        var route = {
+            start: [data.result.origin.originPt.lng, data.result.origin.originPt.lat],
+            end: [data.result.destination.destinationPt.lng, data.result.destination.destinationPt.lat],
+            steps: [],
+            tactics: self.tactics[data.result.routes[0].tactics],
+            distance: data.result.routes[0].distance,
+            duration: data.result.routes[0].duration
+        };
+        var steps = data.result.routes[0].steps;
+        for (var _iterator = steps.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : (0, _getIterator3.default)(_iterator);;) {
+            var _ref;
+
+            if (_isArray) {
+                if (_i >= _iterator.length) break;
+                _ref = _iterator[_i++];
+            } else {
+                _i = _iterator.next();
+                if (_i.done) break;
+                _ref = _i.value;
+            }
+
+            var _ref2 = _ref,
+                idx = _ref2[0],
+                item = _ref2[1];
+
+            if (item.path == "") continue;
+            route.steps[idx] = {
+                distance: item.distance,
+                instruction: item.instruction,
+                path: item.path.split(';').map(function (item) {
+                    return item.split(',');
+                }), // Array.<ol.coordinate>
+                turn: self.turn[item.turn]
+            };
+        }
+        return route;
+    },
+
+    tactics: {
+        11: "最少时间",
+        12: "最短路径"
+    },
+
+    turn: {
+        0: { message: '进入' },
+        1: { message: "直行", backgroundPosition: '-317px -75px' },
+        2: { message: '右前方转弯', backgroundPosition: '-302px -340px' },
+        3: { message: '右转', backgroundPosition: '-291px -102px' },
+        4: { message: '右后方转弯', backgroundPosition: '-291px -376px' },
+        5: { message: '掉头', backgroundPosition: '-268px -340px' },
+        6: { message: '左后方转弯', backgroundPosition: '-291px -400px' },
+        7: { message: '左转', backgroundPosition: '-293px -73px' },
+        8: { message: '左前方转弯', backgroundPosition: '-285px -340px' },
+        9: { message: '左侧', backgroundPosition: '' },
+        10: { message: '右侧', backgroundPosition: '-302px -340px' },
+        11: { message: '分歧-左', backgroundPosition: '' },
+        12: { message: '分歧中央', backgroundPosition: '' },
+        13: { message: '分歧右', backgroundPosition: '' },
+        14: { message: '环岛', backgroundPosition: '' },
+        15: { message: '进渡口', backgroundPosition: '' },
+        16: { message: '出渡口', backgroundPosition: '' }
+    }
+};
+
+/***/ }),
+/* 99 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(2)(
+  /* script */
+  __webpack_require__(97),
+  /* template */
+  __webpack_require__(100),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "F:\\WorkSpace\\leador\\sdk\\src\\trace\\components\\walk\\walk.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] walk.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1b4ff2a4", Component.options)
+  } else {
+    hotAPI.reload("data-v-1b4ff2a4", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 100 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "ishow-lib-driving"
+  }, [_c('div', {
+    staticClass: "planTitle",
+    attrs: {
+      "id": "title",
+      "index": "0"
+    }
+  }), _vm._v(" "), _c('panel-Walk', {
+    attrs: {
+      "routes": _vm.routes
+    }
+  })], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1b4ff2a4", module.exports)
+  }
+}
+
+/***/ }),
+/* 101 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _panelWalkTitle = __webpack_require__(105);
+
+var _panelWalkTitle2 = _interopRequireDefault(_panelWalkTitle);
+
+var _bus = __webpack_require__(3);
+
+var _bus2 = _interopRequireDefault(_bus);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+    props: ['routes'],
+    data: function data() {
+        return {
+            steps: this.routes.steps,
+            distance: this.routes.distance,
+            duration: this.routes.duration,
+            stationsName: [],
+            bgImg: "bgImg",
+            tactics: this.routes.tactics
+        };
+    },
+
+    components: {
+        walkHeader: _panelWalkTitle2.default
+    },
+    mounted: function mounted() {
+        var self = this;
+        if (this.steps.length > 1) {
+            this.steps.forEach(function (item, idx) {
+                self.stationsName.push(item.instruction);
+            });
+        }
+        //            console.log(this.routes)
+        this.steps.forEach(function (step, idx) {
+            var children = document.querySelectorAll('#driving-showHighlight');
+            step.dom = children[idx];
+        });
+    },
+
+    methods: {
+        getUnit: function getUnit(num) {
+            return num = 1E3 < num ? (num / 1E3).toFixed(2) + "公里" : num + "米";
+        },
+        moveTo: function moveTo(step) {
+            //console.log(step);
+            _bus2.default.$emit('moveTo', step);
+        }
+    }
+};
+
+/***/ }),
+/* 102 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+    props: ["distance", "duration", "names", "tactics"],
+    data: function data() {
+        return {
+            dist: this.distance,
+            tac: this.tactics
+        };
+    },
+
+    methods: {
+        getUnit: function getUnit(num) {
+            return num = 1E3 < num ? (num / 1E3).toFixed(2) + "公里" : num + "米";
+        },
+        getMin: function getMin(num) {
+            return num = 3600 < num ? Math.floor(num / 3600) + "小时" + num % 3600 / 60 + "分钟" : num / 60 + "分钟";
+        },
+        getTitlle: function getTitlle(names) {
+            if (names.length > 4) {
+                return names.slice(0, 2).join('>') + '......' + names.slice(names.length - 2).join('>');
+            } else {
+                return names.join('>');
+            }
+        }
+    }
+};
+
+/***/ }),
+/* 103 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(77)(true);
+// imports
+
+
+// module
+exports.push([module.i, "\n.bgImg {\n    background: url(http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png) no-repeat;\n    width: 21px;\n    height: 24px;\n    position: absolute;\n    left: -30px;\n    top: 0px;\n    z-index: 19;\n    /*background-position: -296px -70px;*/\n}\n", "", {"version":3,"sources":["F:/WorkSpace/leador/sdk/src/trace/components/walk/panelWalk.vue?5909c991"],"names":[],"mappings":";AA+EA;IACA,yFAAA;IACA,YAAA;IACA,aAAA;IACA,mBAAA;IACA,YAAA;IACA,SAAA;IACA,YAAA;IACA,sCAAA;CACA","file":"panelWalk.vue","sourcesContent":["<template>\r\n    <dl id=\"resultDiv\" class=\"plan plan-nobus\" style=\"display: block;\">\r\n        <div class=\"ishow-lib-driving\">\r\n            <walk-Header :distance=\"distance\" :duration=\"duration\"  :names=\"stationsName\" :tactics=\"tactics\"></walk-Header>\r\n            <dl id=\"panel_driving_resultDiv\" class=\"plan plan-nobus\" style=\"display: block;\">\r\n                <dt class=\"start\">\r\n                <div class=\"beforedt\">起</div>\r\n                <div class=\"afterdt\"></div>\r\n                <b>起点</b></dt>\r\n                <template v-for=\"(step, idx) in steps\">\r\n                    <template v-if=\"idx == 0\">\r\n                        <dt id=\"driving-showHighlight\" name=\"driving-showHighlight\" @click=\"moveTo(step)\">\r\n                        <div class=\"beforedt\"></div>\r\n                        <div class=\"afterdt\"></div>\r\n                        <img src=\"http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif\">\r\n                        <b></b>进入<b>{{ step.instruction }}</b>，沿着<b>{{ step.instruction\r\n                        }}</b>行驶{{ getUnit(step.distance) }}</dt>\r\n                    </template>\r\n                    <template v-if=\"idx != 0\">\r\n                        <dt id=\"driving-showHighlight\" name=\"driving-showHighlight\" @click=\"moveTo(step)\" >\r\n                        <div class=\"beforedt\"></div>\r\n                        <div class=\"afterdt\"></div>\r\n                        <img src=\"http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif\"\r\n                             v-bind:style=\"{backgroundPosition: steps[idx-1].turn.backgroundPosition}\"       v-bind:class=\"[steps[idx-1].turn.message == '进入' ?  '' : 'bgImg']\">\r\n                        <b></b>{{ steps[idx-1].turn.message }}<b></b>，沿着<b>{{ step.instruction\r\n                        }}</b>行驶{{ getUnit(step.distance) }}</dt>\r\n                    </template>\r\n                </template>\r\n                <dt class=\"end\">\r\n                <div class=\"beforedt\">终</div>\r\n                <b>终点</b></dt></dl>\r\n        </div>\r\n    </dl>\r\n</template>\r\n\r\n<script>\r\n    import Header  from './panelWalkTitle.vue';\r\n    import bus from '../../event/bus';\r\n    export default {\r\n        props: ['routes'],\r\n        data() {\r\n            return {\r\n                steps: this.routes.steps,\r\n                distance: this.routes.distance,\r\n                duration: this.routes.duration,\r\n                stationsName: [],\r\n                bgImg: \"bgImg\",\r\n                tactics: this.routes.tactics\r\n            };\r\n        },\r\n        components: {\r\n            walkHeader: Header\r\n        },\r\n        mounted() {\r\n            var self = this;\r\n            if(this.steps.length > 1){\r\n                this.steps.forEach((item, idx) => {\r\n                    self.stationsName.push(item.instruction);\r\n                })\r\n            }\r\n//            console.log(this.routes)\r\n            this.steps.forEach((step, idx) => {\r\n                var children = document.querySelectorAll('#driving-showHighlight');\r\n                step.dom = children[idx];\r\n            });\r\n        },\r\n        methods: {\r\n            getUnit(num) {\r\n                return num = 1E3 < num ? (num / 1E3).toFixed(2) + \"公里\" : num + \"米\"\r\n            },\r\n            moveTo(step) {\r\n                //console.log(step);\r\n                bus.$emit('moveTo', step);\r\n            }\r\n        }\r\n    }\r\n</script>\r\n\r\n<style>\r\n    .bgImg {\r\n        background: url(http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png) no-repeat;\r\n        width: 21px;\r\n        height: 24px;\r\n        position: absolute;\r\n        left: -30px;\r\n        top: 0px;\r\n        z-index: 19;\r\n        /*background-position: -296px -70px;*/\r\n    }\r\n</style>"],"sourceRoot":""}]);
+
+// exports
+
+
+/***/ }),
+/* 104 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+/* styles */
+__webpack_require__(108)
+
+var Component = __webpack_require__(2)(
+  /* script */
+  __webpack_require__(101),
+  /* template */
+  __webpack_require__(107),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "F:\\WorkSpace\\leador\\sdk\\src\\trace\\components\\walk\\panelWalk.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] panelWalk.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-5960cb58", Component.options)
+  } else {
+    hotAPI.reload("data-v-5960cb58", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 105 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(2)(
+  /* script */
+  __webpack_require__(102),
+  /* template */
+  __webpack_require__(106),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "F:\\WorkSpace\\leador\\sdk\\src\\trace\\components\\walk\\panelWalkTitle.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] panelWalkTitle.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-18fb6810", Component.options)
+  } else {
+    hotAPI.reload("data-v-18fb6810", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "planTitle",
+    attrs: {
+      "id": "panel_driving_title"
+    }
+  }, [_c('h3', {
+    attrs: {
+      "title": ""
+    }
+  }, [_c('b', [_vm._v(_vm._s(_vm.getTitlle(_vm.names)))])]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.getMin(_vm.duration)) + " | " + _vm._s(_vm.getUnit(_vm.dist)) + " | "), _c('span', [_vm._v(_vm._s(_vm.tac))])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-18fb6810", module.exports)
+  }
+}
+
+/***/ }),
+/* 107 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('dl', {
+    staticClass: "plan plan-nobus",
+    staticStyle: {
+      "display": "block"
+    },
+    attrs: {
+      "id": "resultDiv"
+    }
+  }, [_c('div', {
+    staticClass: "ishow-lib-driving"
+  }, [_c('walk-Header', {
+    attrs: {
+      "distance": _vm.distance,
+      "duration": _vm.duration,
+      "names": _vm.stationsName,
+      "tactics": _vm.tactics
+    }
+  }), _vm._v(" "), _c('dl', {
+    staticClass: "plan plan-nobus",
+    staticStyle: {
+      "display": "block"
+    },
+    attrs: {
+      "id": "panel_driving_resultDiv"
+    }
+  }, [_vm._m(0), _vm._v(" "), _vm._l((_vm.steps), function(step, idx) {
+    return [(idx == 0) ? [_c('dt', {
+      attrs: {
+        "id": "driving-showHighlight",
+        "name": "driving-showHighlight"
+      },
+      on: {
+        "click": function($event) {
+          _vm.moveTo(step)
+        }
+      }
+    }, [_c('div', {
+      staticClass: "beforedt"
+    }), _vm._v(" "), _c('div', {
+      staticClass: "afterdt"
+    }), _vm._v(" "), _c('img', {
+      attrs: {
+        "src": "http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif"
+      }
+    }), _vm._v(" "), _c('b'), _vm._v("进入"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("，沿着"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("行驶" + _vm._s(_vm.getUnit(step.distance)))])] : _vm._e(), _vm._v(" "), (idx != 0) ? [_c('dt', {
+      attrs: {
+        "id": "driving-showHighlight",
+        "name": "driving-showHighlight"
+      },
+      on: {
+        "click": function($event) {
+          _vm.moveTo(step)
+        }
+      }
+    }, [_c('div', {
+      staticClass: "beforedt"
+    }), _vm._v(" "), _c('div', {
+      staticClass: "afterdt"
+    }), _vm._v(" "), _c('img', {
+      class: [_vm.steps[idx - 1].turn.message == '进入' ? '' : 'bgImg'],
+      style: ({
+        backgroundPosition: _vm.steps[idx - 1].turn.backgroundPosition
+      }),
+      attrs: {
+        "src": "http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif"
+      }
+    }), _vm._v(" "), _c('b'), _vm._v(_vm._s(_vm.steps[idx - 1].turn.message)), _c('b'), _vm._v("，沿着"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("行驶" + _vm._s(_vm.getUnit(step.distance)))])] : _vm._e()]
+  }), _vm._v(" "), _vm._m(1)], 2)], 1)])
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('dt', {
+    staticClass: "start"
+  }, [_c('div', {
+    staticClass: "beforedt"
+  }, [_vm._v("起")]), _vm._v(" "), _c('div', {
+    staticClass: "afterdt"
+  }), _vm._v(" "), _c('b', [_vm._v("起点")])])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('dt', {
+    staticClass: "end"
+  }, [_c('div', {
+    staticClass: "beforedt"
+  }, [_vm._v("终")]), _vm._v(" "), _c('b', [_vm._v("终点")])])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-5960cb58", module.exports)
+  }
+}
+
+/***/ }),
+/* 108 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(103);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(93)("4604a23c", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js?sourceMap!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-5960cb58\",\"scoped\":false,\"hasInlineConfig\":false}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./panelWalk.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js?sourceMap!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-5960cb58\",\"scoped\":false,\"hasInlineConfig\":false}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./panelWalk.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
 
 /***/ })
 /******/ ]);

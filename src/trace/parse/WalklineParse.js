@@ -1,5 +1,5 @@
 /**
- * Created by Administrator on 2017/4/11/011.
+ * Created by Administrator on 2017/4/14/014.
  */
 
 export default {
@@ -10,15 +10,12 @@ export default {
             end: [data.result.destination.destinationPt.lng, data.result.destination.destinationPt.lat],
             steps: [],
             tactics: self.tactics[data.result.routes[0].tactics],
-            toll: data.result.routes[0].toll + " 元", //过路费
-            passpoi: [],
             distance: data.result.routes[0].distance,
             duration: data.result.routes[0].duration
         };
         var steps = data.result.routes[0].steps;
         for (let [idx, item] of steps.entries()) {
             if (item.path == "") continue;
-            item.ispasspoi == 1 && route.passpoi.push([item.stepDestinationLocation.lng, item.stepDestinationLocation.lat])
             route.steps[idx] = {
                 distance: item.distance,
                 instruction: item.instruction,
@@ -28,17 +25,12 @@ export default {
                 turn: self.turn[item.turn]
             }
         }
-
         return route;
     },
-    // 路径规划策略 默认值 11
+
     tactics: {
         11: "最少时间",
-        1: '最省钱',
-        13: '最少换乘',
-        14: '最少步行',
-        4: '最舒适模式',
-        5: '不乘地铁'
+        12: "最短路径"
     },
 
     turn: {
