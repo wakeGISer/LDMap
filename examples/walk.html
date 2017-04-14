@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="../assets/css/ldMap.css">
     <script src="../dist/ol.js"></script>
     <script src="../dist/ldMap.js"></script>
+    <style>
+
+    </style>
 </head>
 <body>
 <div id="map"></div>
@@ -26,12 +29,12 @@
         })
     });
 
-    var car =  new L.Carline({
+    var walk =  new L.Walkline({
         map: map,
         panel: "panel"
     });
 
-    car.search([116.33357,39.97644],[116.39245,39.91134])
+    walk.search([116.33357,39.97644],[116.39245,39.91134])
 
 </script>
 </body>
