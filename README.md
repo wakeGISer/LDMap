@@ -16,7 +16,7 @@
  
 ## 注意事项
 
-本SDK 依赖openlayer3.20.1，故必须先引用openlayers的js和css
+本SDK 依赖openlayer 3.20.1，故必须先引用openlayers的js和css
  
 ## 安装使用
 
