@@ -1,7 +1,7 @@
 # LDMap - 基于openlayers3.20 的地图组件SDK
 
 
-## 示例
+## 示例 (目前的示例还不能跑，因为个github pages 是走的https协议)
 
   [公交](https://wakegiser.github.io/LDMap/examples/bus.html)
 
