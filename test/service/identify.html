@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../assets/css/ol.css">
+    <script src="../../dist/ol.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<script src="../../dist/ldMap.js"></script>
+<script>
+    var raster = new ol.layer.Tile({
+        source: new ol.source.OSM()
+    });
+
+    var map = new ol.Map({
+        layers: [raster],
+        target: 'map',
+        view: new ol.View({
+            center: [115.18654030522777, 33.48505607105392],
+            zoom: 4,
+            projection: 'EPSG:4326'
+        })
+    });
+
+    var feature = new ol.Feature(new ol.geom.Polygon([[[112.99170896354077, 30.362989385883697], [112.99170896354077, 30.56830925218191], [113.4685581899006, 30.56830925218191], [113.4685581899006, 30.362989385883697], [112.99170896354077, 30.362989385883697]]]));
+
+    var params = new L.IdentifyParameters();
+    params.tolerance = 0; //容差
+    params.returnGeometry = true; // 是否返回几何对象
+    params.layerIds = [0, 1, 2, 3]; // 查询的图层
+    params.spatialReference = 4326; // 坐标系
+    params.geometry = feature.getGeometry(); // 几何查询
+    params.searchText = "蛋糕"; // 关键字
+    params.searchFields = ["ABBRE"]; // 字段
+    params.mapExtent = [112.94050973701053, 30.24954902758225, 113.61498890611142, 30.67709331177782];
+   var identify = new L.IdentifyTask("http://27.17.60.13:6080/arcgis/rest/services/QUERY/MapServer");
+    identify.execute(params, function (json) {
+        console.log(json);
+    })
+</script>
+</body>
+</html>

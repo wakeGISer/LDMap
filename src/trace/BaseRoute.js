@@ -4,8 +4,11 @@
 
 
 /**
- * Abstract Class
- * @param options
+ * 抽象类---任何轨迹服务类都基于此类
+ * @abstract BaseRoute
+ * @param {Object} options 组件参数
+ * @param {ol.Map} options.map 地图实例对象
+ * @param {String} options.panel 组件div的id
  * @constructor
  */
 function BaseRoute(options) {
@@ -20,6 +23,12 @@ function BaseRoute(options) {
     this._setPopup();
 }
 
+
+/**
+ * 轨迹查询
+ * @param {Array} startPoint 起始点经纬度
+ * @param {Array} endPoint 终止点经纬度
+ */
 BaseRoute.prototype.search = function (startPoint, endPoint) {
     var self = this;
     var url = this._transferUrl + "&origin=" + startPoint.join(',') + "&destination=" + endPoint.join(',');
@@ -33,6 +42,12 @@ BaseRoute.prototype.search = function (startPoint, endPoint) {
     })
 };
 
+/**
+ * 发起请求
+ * @param {String} url 请求的地址
+ * @param {Fuction} cb 回调函数
+ * @private
+ */
 BaseRoute.prototype._requestData = function (url, cb) {
     this._responseData = {};
     var self = this;
@@ -41,7 +56,12 @@ BaseRoute.prototype._requestData = function (url, cb) {
     });
 };
 
-
+/**
+ * 发起jsonp 请求
+ * @param {String} url 请求的url地址
+ * @param {Fuction} callback 回调函数
+ * @private
+ */
 BaseRoute.prototype.HTTPJsonP = function (url, callback) {
     var script = document.createElement('script');
     var guid = "_" + Math.round(Math.random() * Math.pow(10, 6)) + "_";
@@ -57,6 +77,12 @@ BaseRoute.prototype.HTTPJsonP = function (url, callback) {
     document.getElementsByTagName('head')[0].appendChild(script);
 };
 
+
+/**
+ * 绘制图表
+ * @param Array.{Object} pointCollection 点集合
+ * @private
+ */
 BaseRoute.prototype._drawIcon = function (pointCollection) {
     var self = this;
     if (Array.isArray(pointCollection)) {
@@ -80,6 +106,11 @@ BaseRoute.prototype._drawIcon = function (pointCollection) {
     }
 };
 
+/**
+ * 添加地图交互
+ * @param Array.{ol.interaction.Select} aSelect 交互
+ * @private
+ */
 BaseRoute.prototype._addInteraction = function (aSelect) {
     var self = this;
     self._selects = aSelect;
@@ -100,6 +131,10 @@ BaseRoute.prototype._addInteraction = function (aSelect) {
     });
 }
 
+/**
+ * 设置弹出窗
+ * @private
+ */
 BaseRoute.prototype._setPopup = function () {
     var self = this;
     var elemPopup = document.createElement('div');
@@ -132,6 +167,11 @@ BaseRoute.prototype._setPopup = function () {
 };
 
 //var geoExtent = geometry.getExtent();
+/**
+ * 动画到当前图形
+ * @param {ol.geom.Geometry} geometry 图形
+ * @private
+ */
 BaseRoute.prototype._fly2Geometry = function (geometry) {
     var extent = geometry.getExtent();
     var view = this._map.getView();

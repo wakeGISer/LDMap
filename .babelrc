@@ -1,16 +1,9 @@
 {
-  "presets": [["es2015", { "loose": true }]],
-  "plugins": ["transform-runtime"],
-  "env": {
-    "utils": {
-      "plugins": [
-        ["module-resolver", {
-          "root": ["element-ui"],
-          "alias": {
-            "element-ui/src": "element-ui/lib"
-          }
-        }]
-      ]
-    }
-  }
+  "presets": [
+    "es2015",
+    "stage-2"
+  ],
+  "plugins": [
+    "transform-runtime"
+  ]
 }

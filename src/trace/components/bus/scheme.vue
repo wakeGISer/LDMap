@@ -1,5 +1,5 @@
 <template>
-    <li class="scheme" v-bind:isopen="isopen" v-bind:data-index="index" @click="toggle">
+    <li class="scheme" v-bind:isopen="isopen"  @click="toggle">
         <font>{{ index + 1 }}</font>
         <form class="bus_line">
             <p class="bus_line_left">
@@ -27,9 +27,9 @@
             }
         },
         mounted() {
-            let scheme = this.route.scheme[0];
-            for (let l in scheme.steps) {
-                var item = scheme.steps[l];
+            var route = this.route;
+            for (let l in route.steps) {
+                var item = route.steps[l];
                 if (null != item.vehicle.name) { // 获取公交线路名称
                     var name = item.vehicle.name
                         , type = item.vehicle.type
@@ -41,13 +41,8 @@
                 }
             }
             0 < this.busNames.length && (this.buslines = this.busNames.join(" - "));
-            this.detailed = this.getUnit(scheme.distance);
+            this.detailed = this.getUnit(route.distance);
         },
-      /*  updated: function() {
-            if(this.index == 0){
-                this.$el.dispatchEvent(new MouseEvent('click'));
-            }
-        },*/
         filters: {
             getBusline: function (lines) {
                 if(lines){
@@ -65,7 +60,6 @@
                 if(this.isopen = !this.isopen){
                     bus.$emit('open', this.index);
                     bus.$emit('draw', this.routes[this.index]);
-
                 }else{
 
                 }

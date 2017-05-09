@@ -13,6 +13,12 @@ import Parse from './parse/CarlineParse';
 
 Car.prototype = Object.create(BaseRoute.prototype);
 
+/**
+ * @param {Object} options 组件参数
+ * @param {ol.Map} options.map 地图实例对象
+ * @param {String} options.panel 组件div的id
+ * @constructor
+ */
 function Car(options) {
     BaseRoute.call(this,options);
     this._transferUrl = Config.routeCarUrl + Config.ak;
@@ -131,6 +137,9 @@ Car.prototype._getPasspoiStyle = function (route) {
     return passStyles;
 }
 
+/**
+ * 清除所有图层
+ */
 Car.prototype.clearLayer = function () {
     this.carLayer.getSource().clear();
     this.iconLayer.getSource().clear();

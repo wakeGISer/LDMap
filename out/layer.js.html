@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: layer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: layer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>goog.provide('ol.layer.Layer');
+
+goog.require('ol.events');
+goog.require('ol.events.EventType');
+goog.require('ol');
+goog.require('ol.Object');
+goog.require('ol.layer.Base');
+goog.require('ol.layer.Property');
+goog.require('ol.obj');
+goog.require('ol.render.EventType');
+goog.require('ol.source.State');
+
+
+/**
+ * @classdesc
+ * Abstract base class; normally only used for creating subclasses and not
+ * instantiated in apps.
+ * A visual representation of raster or vector map data.
+ * Layers group together those properties that pertain to how the data is to be
+ * displayed, irrespective of the source of that data.
+ *
+ * Layers are usually added to a map with {@link ol.Map#addLayer}. Components
+ * like {@link ol.interaction.Select} use unmanaged layers internally. These
+ * unmanaged layers are associated with the map using
+ * {@link ol.layer.Layer#setMap} instead.
+ *
+ * A generic `change` event is fired when the state of the source changes.
+ *
+ * @constructor
+ * @abstract
+ * @extends {ol.layer.Base}
+ * @fires ol.render.Event
+ * @param {olx.layer.LayerOptions} options Layer options.
+ * @api
+ */
+ol.layer.Layer = function(options) {
+
+  var baseOptions = ol.obj.assign({}, options);
+  delete baseOptions.source;
+
+  ol.layer.Base.call(this, /** @type {olx.layer.BaseOptions} */ (baseOptions));
+
+  /**
+   * @private
+   * @type {?ol.EventsKey}
+   */
+  this.mapPrecomposeKey_ = null;
+
+  /**
+   * @private
+   * @type {?ol.EventsKey}
+   */
+  this.mapRenderKey_ = null;
+
+  /**
+   * @private
+   * @type {?ol.EventsKey}
+   */
+  this.sourceChangeKey_ = null;
+
+  if (options.map) {
+    this.setMap(options.map);
+  }
+
+  ol.events.listen(this,
+      ol.Object.getChangeEventType(ol.layer.Property.SOURCE),
+      this.handleSourcePropertyChange_, this);
+
+  var source = options.source ? options.source : null;
+  this.setSource(source);
+};
+ol.inherits(ol.layer.Layer, ol.layer.Base);
+
+
+/**
+ * Return `true` if the layer is visible, and if the passed resolution is
+ * between the layer's minResolution and maxResolution. The comparison is
+ * inclusive for `minResolution` and exclusive for `maxResolution`.
+ * @param {ol.LayerState} layerState Layer state.
+ * @param {number} resolution Resolution.
+ * @return {boolean} The layer is visible at the given resolution.
+ */
+ol.layer.Layer.visibleAtResolution = function(layerState, resolution) {
+  return layerState.visible &amp;&amp; resolution >= layerState.minResolution &amp;&amp;
+      resolution &lt; layerState.maxResolution;
+};
+
+
+/**
+ * @inheritDoc
+ */
+ol.layer.Layer.prototype.getLayersArray = function(opt_array) {
+  var array = opt_array ? opt_array : [];
+  array.push(this);
+  return array;
+};
+
+
+/**
+ * @inheritDoc
+ */
+ol.layer.Layer.prototype.getLayerStatesArray = function(opt_states) {
+  var states = opt_states ? opt_states : [];
+  states.push(this.getLayerState());
+  return states;
+};
+
+
+/**
+ * Get the layer source.
+ * @return {ol.source.Source} The layer source (or `null` if not yet set).
+ * @observable
+ * @api
+ */
+ol.layer.Layer.prototype.getSource = function() {
+  var source = this.get(ol.layer.Property.SOURCE);
+  return /** @type {ol.source.Source} */ (source) || null;
+};
+
+
+/**
+  * @inheritDoc
+  */
+ol.layer.Layer.prototype.getSourceState = function() {
+  var source = this.getSource();
+  return !source ? ol.source.State.UNDEFINED : source.getState();
+};
+
+
+/**
+ * @private
+ */
+ol.layer.Layer.prototype.handleSourceChange_ = function() {
+  this.changed();
+};
+
+
+/**
+ * @private
+ */
+ol.layer.Layer.prototype.handleSourcePropertyChange_ = function() {
+  if (this.sourceChangeKey_) {
+    ol.events.unlistenByKey(this.sourceChangeKey_);
+    this.sourceChangeKey_ = null;
+  }
+  var source = this.getSource();
+  if (source) {
+    this.sourceChangeKey_ = ol.events.listen(source,
+        ol.events.EventType.CHANGE, this.handleSourceChange_, this);
+  }
+  this.changed();
+};
+
+
+/**
+ * Sets the layer to be rendered on top of other layers on a map. The map will
+ * not manage this layer in its layers collection, and the callback in
+ * {@link ol.Map#forEachLayerAtPixel} will receive `null` as layer. This
+ * is useful for temporary layers. To remove an unmanaged layer from the map,
+ * use `#setMap(null)`.
+ *
+ * To add the layer to a map and have it managed by the map, use
+ * {@link ol.Map#addLayer} instead.
+ * @param {ol.Map} map Map.
+ * @api
+ */
+ol.layer.Layer.prototype.setMap = function(map) {
+  if (this.mapPrecomposeKey_) {
+    ol.events.unlistenByKey(this.mapPrecomposeKey_);
+    this.mapPrecomposeKey_ = null;
+  }
+  if (!map) {
+    this.changed();
+  }
+  if (this.mapRenderKey_) {
+    ol.events.unlistenByKey(this.mapRenderKey_);
+    this.mapRenderKey_ = null;
+  }
+  if (map) {
+    this.mapPrecomposeKey_ = ol.events.listen(
+        map, ol.render.EventType.PRECOMPOSE, function(evt) {
+          var layerState = this.getLayerState();
+          layerState.managed = false;
+          layerState.zIndex = Infinity;
+          evt.frameState.layerStatesArray.push(layerState);
+          evt.frameState.layerStates[ol.getUid(this)] = layerState;
+        }, this);
+    this.mapRenderKey_ = ol.events.listen(
+        this, ol.events.EventType.CHANGE, map.render, map);
+    this.changed();
+  }
+};
+
+
+/**
+ * Set the layer source.
+ * @param {ol.source.Source} source The layer source.
+ * @observable
+ * @api
+ */
+ol.layer.Layer.prototype.setSource = function(source) {
+  this.set(ol.layer.Property.SOURCE, source);
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="L.Busline.html">Busline</a></li><li><a href="L.Carline.html">Carline</a></li><li><a href="L.Walkline.html">Walkline</a></li><li><a href="ol.control.Attribution.html">Attribution</a></li><li><a href="ol.control.Control.html">Control</a></li><li><a href="ol.Feature.html">Feature</a></li><li><a href="ol.geom.Circle.html">Circle</a></li><li><a href="ol.geom.LinearRing.html">LinearRing</a></li><li><a href="ol.geom.LineString.html">LineString</a></li><li><a href="ol.geom.Point.html">Point</a></li><li><a href="ol.geom.Polygon.html">Polygon</a></li><li><a href="ol.interaction.Interaction.html">Interaction</a></li><li><a href="ol.layer.Layer.html">Layer</a></li><li><a href="ol.layer.Tile.html">Tile</a></li><li><a href="ol.Map.html">Map</a></li><li><a href="ol.Overlay.html">Overlay</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Apr 18 2017 10:49:05 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

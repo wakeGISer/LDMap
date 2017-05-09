@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: feature.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: feature.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>goog.provide('ol.Feature');
+
+goog.require('ol.asserts');
+goog.require('ol.events');
+goog.require('ol.events.EventType');
+goog.require('ol');
+goog.require('ol.Object');
+goog.require('ol.geom.Geometry');
+goog.require('ol.style.Style');
+
+
+/**
+ * @classdesc
+ * 一个向量对象几何和其他的地理特征
+ * 属性,类似于矢量文件格式的功能
+ * GeoJSON。
+ * 功能与“setStyle”可以单独设计;否则他们使用
+ * 风格的向量层。
+ * 注意,属性设置为{ @link ol。对象}属性上
+ *功能对象,所以他们可观测,获取/设置访问器。
+ *
+ * 通常,一个功能有一个单一的几何性质。你可以设置
+ * 几何使用“setGeometry”方法和“getGeometry”得到它。
+ * 它可以存储多个几何特性使用属性
+ * 属性。默认情况下,用于呈现几何了
+ * 属性名“几何”。如果你想使用另一个几何性质
+ * 呈现,使用“setGeometryName”方法来改变属性
+ * 相关的几何特性。例如:
+ * ```js
+ * var feature = new ol.Feature({
+ *   geometry: new ol.geom.Polygon(polyCoords),
+ *   labelPoint: new ol.geom.Point(labelCoords),
+ *   name: 'My Polygon'
+ * });
+ *
+ * // 获取多边形的geometry
+ * var poly = feature.getGeometry();
+ *
+ * // 呈现功能作为一个使用labelPoint的坐标点
+ * feature.setGeometryName('labelPoint');
+ *
+ * // 得到点几何
+ * var point = feature.getGeometry();
+ * ```
+ *
+ * @constructor
+ * @extends {ol.Object}
+ * @param {ol.geom.Geometry|Object.&lt;string, *>=} opt_geometryOrProperties
+ *     You may pass a Geometry object directly, or an object literal
+ *     containing properties.  If you pass an object literal, you may
+ *     include a Geometry associated with a `geometry` key.
+ * @api
+ */
+ol.Feature = function(opt_geometryOrProperties) {
+
+  ol.Object.call(this);
+
+  /**
+   * @private
+   * @type {number|string|undefined}
+   */
+  this.id_ = undefined;
+
+  /**
+   * @type {string}
+   * @private
+   */
+  this.geometryName_ = 'geometry';
+
+  /**
+   * User provided style.
+   * @private
+   * @type {ol.style.Style|Array.&lt;ol.style.Style>|
+   *     ol.FeatureStyleFunction}
+   */
+  this.style_ = null;
+
+  /**
+   * @private
+   * @type {ol.FeatureStyleFunction|undefined}
+   */
+  this.styleFunction_ = undefined;
+
+  /**
+   * @private
+   * @type {?ol.EventsKey}
+   */
+  this.geometryChangeKey_ = null;
+
+  ol.events.listen(
+      this, ol.Object.getChangeEventType(this.geometryName_),
+      this.handleGeometryChanged_, this);
+
+  if (opt_geometryOrProperties !== undefined) {
+    if (opt_geometryOrProperties instanceof ol.geom.Geometry ||
+        !opt_geometryOrProperties) {
+      var geometry = opt_geometryOrProperties;
+      this.setGeometry(geometry);
+    } else {
+      /** @type {Object.&lt;string, *>} */
+      var properties = opt_geometryOrProperties;
+      this.setProperties(properties);
+    }
+  }
+};
+ol.inherits(ol.Feature, ol.Object);
+
+
+/**
+ * 克隆这一特性。如果原始特性有一个几何
+ * 也是克隆。克隆的特性id没有设置。
+ * @return {ol.Feature} The clone.
+ * @api
+ */
+ol.Feature.prototype.clone = function() {
+  var clone = new ol.Feature(this.getProperties());
+  clone.setGeometryName(this.getGeometryName());
+  var geometry = this.getGeometry();
+  if (geometry) {
+    clone.setGeometry(geometry.clone());
+  }
+  var style = this.getStyle();
+  if (style) {
+    clone.setStyle(style);
+  }
+  return clone;
+};
+
+
+/**
+ * 几何特性的默认。功能可以有任意数量的命名
+ * 几何图形。“默认”几何(默认情况下)呈现
+ * 设置当调用{@link ol.Feature#setGeometry}.
+ * @return {ol.geom.Geometry|undefined} The default geometry for the feature.
+ * @api
+ * @observable
+ */
+ol.Feature.prototype.getGeometry = function() {
+  return /** @type {ol.geom.Geometry|undefined} */ (
+      this.get(this.geometryName_));
+};
+
+
+/**
+ * 功能标识符。这是一个稳定的特性和标识符
+ * 要么是设置当从一个远程数据源读取数据或设置明确
+ * 调用{@link ol.Feature#setId}.
+ * @return {number|string|undefined} Id.
+ * @api
+ */
+ol.Feature.prototype.getId = function() {
+  return this.id_;
+};
+
+
+/**
+ * 几何特性的默认的名称。默认情况下,默认值
+ * 几何被命名为“几何”。
+ * @return {string} Get the property name associated with the default geometry
+ *     for this feature.
+ * @api
+ */
+ol.Feature.prototype.getGeometryName = function() {
+  return this.geometryName_;
+};
+
+
+/**
+ * 获取要素的style。
+ * {@link ol.Feature#setStyle} method.
+ * @return {ol.style.Style|Array.&lt;ol.style.Style>|
+ *     ol.FeatureStyleFunction|ol.StyleFunction} The feature style.
+ * @api
+ */
+ol.Feature.prototype.getStyle = function() {
+  return this.style_;
+};
+
+
+/**
+ * 获取要素的 style function.
+ * @return {ol.FeatureStyleFunction|undefined} Return a function
+ * representing the current style of this feature.
+ * @api
+ */
+ol.Feature.prototype.getStyleFunction = function() {
+  return this.styleFunction_;
+};
+
+
+/**
+ * @private
+ */
+ol.Feature.prototype.handleGeometryChange_ = function() {
+  this.changed();
+};
+
+
+/**
+ * @private
+ */
+ol.Feature.prototype.handleGeometryChanged_ = function() {
+  if (this.geometryChangeKey_) {
+    ol.events.unlistenByKey(this.geometryChangeKey_);
+    this.geometryChangeKey_ = null;
+  }
+  var geometry = this.getGeometry();
+  if (geometry) {
+    this.geometryChangeKey_ = ol.events.listen(geometry,
+        ol.events.EventType.CHANGE, this.handleGeometryChange_, this);
+  }
+  this.changed();
+};
+
+
+/**
+ * 设置默认的几何特性.  这将更新属性
+ * with the name returned by {@link ol.Feature#getGeometryName}.
+ * @param {ol.geom.Geometry|undefined} geometry The new geometry.
+ * @api
+ * @observable
+ */
+ol.Feature.prototype.setGeometry = function(geometry) {
+  this.set(this.geometryName_, geometry);
+};
+
+
+/**
+ * 设置的要素的style。这可能是一个单一的样式对象,数组
+ * 的风格,或一个函数,接受一项决议,并返回一个数组
+ * style。如果是“null” 这feature 没有style
+ * @param {ol.style.Style|Array.&lt;ol.style.Style>|
+ *     ol.FeatureStyleFunction|ol.StyleFunction} style Style for this feature.
+ * @api
+ * @fires ol.events.Event#event:change
+ */
+ol.Feature.prototype.setStyle = function(style) {
+  this.style_ = style;
+  this.styleFunction_ = !style ?
+      undefined : ol.Feature.createStyleFunction(style);
+  this.changed();
+};
+
+
+/**
+ * 设置特性id。特性id被认为是稳定的和可能时使用
+ * 请求功能或比较标识符返回从一个远程数据源。
+ * The feature id can be used with the {@link ol.source.Vector#getFeatureById}
+ * method.
+ * @param {number|string|undefined} id The feature id.
+ * @api
+ * @fires ol.events.Event#event:change
+ */
+ol.Feature.prototype.setId = function(id) {
+  this.id_ = id;
+  this.changed();
+};
+
+
+/**
+ * 设置属性名时使用默认的几何特性。
+ * When calling {@link ol.Feature#getGeometry}, the value of the property with
+ * this name will be returned.
+ * @param {string} name The property name of the default geometry.
+ * @api
+ */
+ol.Feature.prototype.setGeometryName = function(name) {
+  ol.events.unlisten(
+      this, ol.Object.getChangeEventType(this.geometryName_),
+      this.handleGeometryChanged_, this);
+  this.geometryName_ = name;
+  ol.events.listen(
+      this, ol.Object.getChangeEventType(this.geometryName_),
+      this.handleGeometryChanged_, this);
+  this.handleGeometryChanged_();
+};
+
+
+/**
+ * 所提供的对象转换成一个特性风格功能。函数通过
+ * 通过改变。ol.style数组。包装风格或单一风格对象
+ * 在一个新特性风格的功能。
+ * @param {ol.FeatureStyleFunction|!Array.&lt;ol.style.Style>|!ol.style.Style} obj
+ *     A feature style function, a single style, or an array of styles.
+ * @return {ol.FeatureStyleFunction} A style function.
+ */
+ol.Feature.createStyleFunction = function(obj) {
+  var styleFunction;
+
+  if (typeof obj === 'function') {
+    if (obj.length == 2) {
+      styleFunction = function(resolution) {
+        return /** @type {ol.StyleFunction} */ (obj)(this, resolution);
+      };
+    } else {
+      styleFunction = obj;
+    }
+  } else {
+    /**
+     * @type {Array.&lt;ol.style.Style>}
+     */
+    var styles;
+    if (Array.isArray(obj)) {
+      styles = obj;
+    } else {
+      ol.asserts.assert(obj instanceof ol.style.Style,
+          41); // Expected an `ol.style.Style` or an array of `ol.style.Style`
+      styles = [obj];
+    }
+    styleFunction = function() {
+      return styles;
+    };
+  }
+  return styleFunction;
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="L.Busline.html">Busline</a></li><li><a href="L.Carline.html">Carline</a></li><li><a href="L.Walkline.html">Walkline</a></li><li><a href="ol.control.Attribution.html">Attribution</a></li><li><a href="ol.control.Control.html">Control</a></li><li><a href="ol.Feature.html">Feature</a></li><li><a href="ol.geom.Circle.html">Circle</a></li><li><a href="ol.geom.LineString.html">LineString</a></li><li><a href="ol.geom.Point.html">Point</a></li><li><a href="ol.geom.Polygon.html">Polygon</a></li><li><a href="ol.layer.Tile.html">Tile</a></li><li><a href="ol.Map.html">Map</a></li><li><a href="ol.Overlay.html">Overlay</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Wed Apr 19 2017 16:55:43 GMT+0800 (中国标准时间)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

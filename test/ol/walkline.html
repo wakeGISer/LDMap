@@ -19,8 +19,8 @@
         target: 'map',
         view: new ol.View({
             projection: 'EPSG:4326',
-            center: [116.333472, 39.97643],
-            zoom: 14
+            center: [113.541472,22.2105],
+            zoom: 16
         })
     });
     var style = new ol.style.Style({
@@ -35,18 +35,22 @@
     });
     map.addLayer(vector);
 
-    var feature = new ol.Feature(new ol.geom.LineString([[116.333472, 39.97643], [116.332328, 39.976393333333334], [116.331992, 39.97637666666667], [116.33124, 39.976366666666664], [116.32956, 39.97632], [116.328808, 39.97628666666667], [116.328512, 39.97628666666667]]));
+    var feature = new ol.Feature(new ol.geom.LineString([[113.541472,22.2105], [113.541568, 22.210521666666665]]));
     //    feature.setStyle(style);
 
     vector.getSource().addFeature(feature);
 
-    var extent = feature.getGeometry().getExtent();
-    var view = map.getView();
-    view.fit(extent, {
-        size: map.getSize(),
-        duration: 2000,
-        easing: ol.easing.inAndOut
-    });
+    var extent = feature.getGeometry().getExtent()
+
+    var esrijson  = new ol.format.EsriJSON();
+    var json = esrijson.writeFeature(feature);
+    console.log(json);
+//    var view = map.getView();
+//    view.fit(extent, {
+//        size: map.getSize(),
+//        duration: 2000,
+//        easing: ol.easing.inAndOut
+//    });
     //    view.setExtent(extent);
 </script>
 </body>

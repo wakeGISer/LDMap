@@ -63,36 +63,18 @@
 /******/ 	__webpack_require__.p = "/dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 32);
+/******/ 	return __webpack_require__(__webpack_require__.s = 60);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
 /***/ (function(module, exports) {
 
-// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-var global = module.exports = typeof window != 'undefined' && window.Math == Math
-  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
-if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
+var core = module.exports = {version: '2.4.0'};
+if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var store      = __webpack_require__(28)('wks')
-  , uid        = __webpack_require__(29)
-  , Symbol     = __webpack_require__(0).Symbol
-  , USE_SYMBOL = typeof Symbol == 'function';
-
-var $exports = module.exports = function(name){
-  return store[name] || (store[name] =
-    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
-};
-
-$exports.store = store;
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports) {
 
 // this module is a runtime utility for cleaner component module output and will
@@ -149,15 +131,17 @@ module.exports = function normalizeComponent (
 
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var _vue = __webpack_require__(16);
+var _vue = __webpack_require__(13);
 
 var _vue2 = _interopRequireDefault(_vue);
 
@@ -173,12 +157,43 @@ var bus = new _vue2.default(); /**
 exports.default = bus;
 
 /***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var store      = __webpack_require__(40)('wks')
+  , uid        = __webpack_require__(41)
+  , Symbol     = __webpack_require__(5).Symbol
+  , USE_SYMBOL = typeof Symbol == 'function';
+
+var $exports = module.exports = function(name){
+  return store[name] || (store[name] =
+    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
+};
+
+$exports.store = store;
+
+/***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dP         = __webpack_require__(12)
-  , createDesc = __webpack_require__(26);
-module.exports = __webpack_require__(7) ? function(object, key, value){
+module.exports = { "default": __webpack_require__(73), __esModule: true };
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global = module.exports = typeof window != 'undefined' && window.Math == Math
+  ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
+if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dP         = __webpack_require__(20)
+  , createDesc = __webpack_require__(38);
+module.exports = __webpack_require__(9) ? function(object, key, value){
   return dP.f(object, key, createDesc(1, value));
 } : function(object, key, value){
   object[key] = value;
@@ -186,33 +201,110 @@ module.exports = __webpack_require__(7) ? function(object, key, value){
 };
 
 /***/ }),
-/* 5 */
+/* 7 */
+/***/ (function(module, exports) {
+
+module.exports = {};
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(11);
+var isObject = __webpack_require__(19);
 module.exports = function(it){
   if(!isObject(it))throw TypeError(it + ' is not an object!');
   return it;
 };
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-var core = module.exports = {version: '2.4.0'};
-if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-
-/***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Thank's IE8 for his funny defineProperty
-module.exports = !__webpack_require__(23)(function(){
+module.exports = !__webpack_require__(11)(function(){
   return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
 });
 
 /***/ }),
-/* 8 */
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var global    = __webpack_require__(5)
+  , core      = __webpack_require__(0)
+  , ctx       = __webpack_require__(82)
+  , hide      = __webpack_require__(6)
+  , PROTOTYPE = 'prototype';
+
+var $export = function(type, name, source){
+  var IS_FORCED = type & $export.F
+    , IS_GLOBAL = type & $export.G
+    , IS_STATIC = type & $export.S
+    , IS_PROTO  = type & $export.P
+    , IS_BIND   = type & $export.B
+    , IS_WRAP   = type & $export.W
+    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
+    , expProto  = exports[PROTOTYPE]
+    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
+    , key, own, out;
+  if(IS_GLOBAL)source = name;
+  for(key in source){
+    // contains in native
+    own = !IS_FORCED && target && target[key] !== undefined;
+    if(own && key in exports)continue;
+    // export native or passed
+    out = own ? target[key] : source[key];
+    // prevent global pollution for namespaces
+    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
+    // bind timers to global for call from export context
+    : IS_BIND && own ? ctx(out, global)
+    // wrap global constructors for prevent change them in library
+    : IS_WRAP && target[key] == out ? (function(C){
+      var F = function(a, b, c){
+        if(this instanceof C){
+          switch(arguments.length){
+            case 0: return new C;
+            case 1: return new C(a);
+            case 2: return new C(a, b);
+          } return new C(a, b, c);
+        } return C.apply(this, arguments);
+      };
+      F[PROTOTYPE] = C[PROTOTYPE];
+      return F;
+    // make static versions for prototype methods
+    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
+    if(IS_PROTO){
+      (exports.virtual || (exports.virtual = {}))[key] = out;
+      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
+      if(type & $export.R && expProto && !expProto[key])hide(expProto, key, out);
+    }
+  }
+};
+// type bitmap
+$export.F = 1;   // forced
+$export.G = 2;   // global
+$export.S = 4;   // static
+$export.P = 8;   // proto
+$export.B = 16;  // bind
+$export.W = 32;  // wrap
+$export.U = 64;  // safe
+$export.R = 128; // real proto method for `library` 
+module.exports = $export;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports) {
+
+module.exports = function(exec){
+  try {
+    return !!exec();
+  } catch(e){
+    return true;
+  }
+};
+
+/***/ }),
+/* 12 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = {}.hasOwnProperty;
@@ -221,84 +313,7 @@ module.exports = function(it, key){
 };
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports) {
-
-module.exports = {};
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-// 7.2.1 RequireObjectCoercible(argument)
-module.exports = function(it){
-  if(it == undefined)throw TypeError("Can't call method on  " + it);
-  return it;
-};
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports) {
-
-module.exports = function(it){
-  return typeof it === 'object' ? it !== null : typeof it === 'function';
-};
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var anObject       = __webpack_require__(5)
-  , IE8_DOM_DEFINE = __webpack_require__(55)
-  , toPrimitive    = __webpack_require__(69)
-  , dP             = Object.defineProperty;
-
-exports.f = __webpack_require__(7) ? Object.defineProperty : function defineProperty(O, P, Attributes){
-  anObject(O);
-  P = toPrimitive(P, true);
-  anObject(Attributes);
-  if(IE8_DOM_DEFINE)try {
-    return dP(O, P, Attributes);
-  } catch(e){ /* empty */ }
-  if('get' in Attributes || 'set' in Attributes)throw TypeError('Accessors not supported!');
-  if('value' in Attributes)O[P] = Attributes.value;
-  return O;
-};
-
-/***/ }),
 /* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var shared = __webpack_require__(28)('keys')
-  , uid    = __webpack_require__(29);
-module.exports = function(key){
-  return shared[key] || (shared[key] = uid(key));
-};
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports) {
-
-// 7.1.4 ToInteger
-var ceil  = Math.ceil
-  , floor = Math.floor;
-module.exports = function(it){
-  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-};
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// to indexed object, toObject with fallback for non-array-like ES3 strings
-var IObject = __webpack_require__(56)
-  , defined = __webpack_require__(10);
-module.exports = function(it){
-  return IObject(defined(it));
-};
-
-/***/ }),
-/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -9618,10 +9633,335 @@ return Vue$3;
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)))
+
+/***/ }),
+/* 14 */,
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+/**
+ * Created by Administrator on 2017/4/11/011.
+ */
+
+/**
+ * 抽象类---任何轨迹服务类都基于此类
+ * @abstract BaseRoute
+ * @param {Object} options 组件参数
+ * @param {ol.Map} options.map 地图实例对象
+ * @param {String} options.panel 组件div的id
+ * @constructor
+ */
+function BaseRoute(options) {
+    options = options || {};
+    this._panel = options.panel;
+    options.map instanceof ol.Map ? this._map = options.map : console.error('the attr map of options is required'); //required
+    //this.overlay;
+    this.iconLayer = new ol.layer.Vector({
+        source: new ol.source.Vector()
+    });
+    this._map.addLayer(this.iconLayer);
+    this._setPopup();
+}
+
+/**
+ * 轨迹查询
+ * @param {Array} startPoint 起始点经纬度
+ * @param {Array} endPoint 终止点经纬度
+ */
+BaseRoute.prototype.search = function (startPoint, endPoint) {
+    var self = this;
+    var url = this._transferUrl + "&origin=" + startPoint.join(',') + "&destination=" + endPoint.join(',');
+    self._requestData(url, function (status, message) {
+        if (status == 0) {
+            self._responseData = message;
+            self._initPanel();
+        } else {
+            throw Error(message);
+        }
+    });
+};
+
+/**
+ * 发起请求
+ * @param {String} url 请求的地址
+ * @param {Fuction} cb 回调函数
+ * @private
+ */
+BaseRoute.prototype._requestData = function (url, cb) {
+    this._responseData = {};
+    var self = this;
+    this.HTTPJsonP(url, function (json) {
+        cb.call(self, json.status, 0 == json.status ? json : json.message);
+    });
+};
+
+/**
+ * 发起jsonp 请求
+ * @param {String} url 请求的url地址
+ * @param {Fuction} callback 回调函数
+ * @private
+ */
+BaseRoute.prototype.HTTPJsonP = function (url, callback) {
+    var script = document.createElement('script');
+    var guid = "_" + Math.round(Math.random() * Math.pow(10, 6)) + "_";
+    script.type = 'text/javascript';
+    script.charset = 'utf-8';
+    script.src = url + "&callback=window." + guid;
+    window[guid] = function (data) {
+        window[guid] = null;
+        delete window[guid];
+        callback(data);
+        document.getElementsByTagName("head")[0].removeChild(script);
+    };
+    document.getElementsByTagName('head')[0].appendChild(script);
+};
+
+/**
+ * 绘制图表
+ * @param Array.{Object} pointCollection 点集合
+ * @private
+ */
+BaseRoute.prototype._drawIcon = function (pointCollection) {
+    var self = this;
+    if (Array.isArray(pointCollection)) {
+        pointCollection.forEach(function (item) {
+            var anchor = new ol.Feature({
+                geometry: new ol.geom.Point(item.point)
+            });
+            anchor.setStyle(new ol.style.Style({
+                image: item.image
+            }));
+            self.iconLayer.getSource().addFeature(anchor);
+        });
+    } else {
+        var anchor = new ol.Feature({
+            geometry: new ol.geom.Point(pointCollection.point)
+        });
+        anchor.setStyle(new ol.style.Style({
+            image: pointCollection.image
+        }));
+        self.iconLayer.getSource().addFeature(anchor);
+    }
+};
+
+/**
+ * 添加地图交互
+ * @param Array.{ol.interaction.Select} aSelect 交互
+ * @private
+ */
+BaseRoute.prototype._addInteraction = function (aSelect) {
+    var self = this;
+    self._selects = aSelect;
+    aSelect.forEach(function (select) {
+        self._map.addInteraction(select);
+        select.on('select', function (e) {
+            if (e.selected[0]) {
+                // console.log(e);
+                var step = e.selected[0].getProperties()["step"];
+                var coordinate = e.mapBrowserEvent.coordinate;
+                self._content.innerHTML = step.dom.innerHTML;
+                self.overlay.setPosition(coordinate);
+            } else {
+                // close the overlay
+                self._closer.dispatchEvent(new MouseEvent('click'));
+            }
+        });
+    });
+};
+
+/**
+ * 设置弹出窗
+ * @private
+ */
+BaseRoute.prototype._setPopup = function () {
+    var self = this;
+    var elemPopup = document.createElement('div');
+    elemPopup.id = "leador-popup";
+    elemPopup.className = "leador-ol-popup";
+    elemPopup.innerHTML = '<a href="#" id="leador-popup-closer" class="leador-ol-popup-closer"></a> <div id="leador-popup-content"></div>';
+    document.body.appendChild(elemPopup);
+    var container = document.getElementById('leador-popup');
+    var content = document.getElementById('leador-popup-content');
+    var closer = document.getElementById('leador-popup-closer');
+    this._content = content;
+    this._closer = closer;
+    this.overlay = new ol.Overlay( /** @type {olx.OverlayOptions} */{
+        element: container,
+        autoPan: true,
+        autoPanAnimation: {
+            duration: 250
+        }
+    });
+    closer.onclick = function () {
+        self.overlay.setPosition(undefined);
+        closer.blur();
+        self._selects.forEach(function (select) {
+            select.getFeatures().clear();
+        });
+        return false;
+    };
+    this._map.addOverlay(this.overlay);
+};
+
+//var geoExtent = geometry.getExtent();
+/**
+ * 动画到当前图形
+ * @param {ol.geom.Geometry} geometry 图形
+ * @private
+ */
+BaseRoute.prototype._fly2Geometry = function (geometry) {
+    var extent = geometry.getExtent();
+    var view = this._map.getView();
+    /*
+     4.0.0 release simplified ol.view#fit() API
+    view.fit(extent, {
+        size: this._map.getSize(),
+        duration: 2000,
+        easing: ol.easing.inAndOut
+    })*/
+
+    /**
+     * 3.20.0 old API
+     */
+    view.fit(extent, this._map.getSize(), {
+        duration: 2000,
+        easing: ol.easing.inAndOut
+    });
+};
+
+exports.default = BaseRoute;
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+/**
+ * Created by Administrator on 2017/4/10/010.
+ */
+
+exports.default = {
+    routeBusUrl: "http://api.ishowchina.com/v3/route/bus?",
+    routeCarUrl: "http://api.ishowchina.com/v3/route/car?", // 服务api地址
+    routeWalkUrl: "http://api.ishowchina.com/v3/route/walk?",
+    ak: "ak=ec85d3648154874552835438ac6a02b2",
+    version: "v=3.4.3",
+    STATIC_URL: "http://webapi.ishowchina.com/jsmap/3.4.3/"
+};
 
 /***/ }),
 /* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(77), __esModule: true };
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+// 7.2.1 RequireObjectCoercible(argument)
+module.exports = function(it){
+  if(it == undefined)throw TypeError("Can't call method on  " + it);
+  return it;
+};
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+module.exports = function(it){
+  return typeof it === 'object' ? it !== null : typeof it === 'function';
+};
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var anObject       = __webpack_require__(8)
+  , IE8_DOM_DEFINE = __webpack_require__(84)
+  , toPrimitive    = __webpack_require__(99)
+  , dP             = Object.defineProperty;
+
+exports.f = __webpack_require__(9) ? Object.defineProperty : function defineProperty(O, P, Attributes){
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if(IE8_DOM_DEFINE)try {
+    return dP(O, P, Attributes);
+  } catch(e){ /* empty */ }
+  if('get' in Attributes || 'set' in Attributes)throw TypeError('Accessors not supported!');
+  if('value' in Attributes)O[P] = Attributes.value;
+  return O;
+};
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+var $keys       = __webpack_require__(92)
+  , enumBugKeys = __webpack_require__(34);
+
+module.exports = Object.keys || function keys(O){
+  return $keys(O, enumBugKeys);
+};
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var shared = __webpack_require__(40)('keys')
+  , uid    = __webpack_require__(41);
+module.exports = function(key){
+  return shared[key] || (shared[key] = uid(key));
+};
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+// 7.1.4 ToInteger
+var ceil  = Math.ceil
+  , floor = Math.floor;
+module.exports = function(it){
+  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+};
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// to indexed object, toObject with fallback for non-array-like ES3 strings
+var IObject = __webpack_require__(35)
+  , defined = __webpack_require__(18);
+module.exports = function(it){
+  return IObject(defined(it));
+};
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 7.1.13 ToObject(argument)
+var defined = __webpack_require__(18);
+module.exports = function(it){
+  return Object(defined(it));
+};
+
+/***/ }),
+/* 26 */
 /***/ (function(module, exports) {
 
 var g;
@@ -9648,13 +9988,174 @@ module.exports = g;
 
 
 /***/ }),
-/* 18 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(47), __esModule: true };
+"use strict";
+
+
+exports.__esModule = true;
+
+var _assign = __webpack_require__(69);
+
+var _assign2 = _interopRequireDefault(_assign);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = _assign2.default || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
 
 /***/ }),
-/* 19 */
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+/**
+ * Created by Administrator on 2017/4/10/010.
+ */
+
+exports.default = {
+    parse: function parse(data) {
+        var self = this;
+        var routes = [];
+        for (var i = 0; i < data.result.routes.length; i++) {
+            var scheme = data.result.routes[i].scheme[0];
+            routes[i] = {
+                start: scheme.originLocation.split(','),
+                end: scheme.destinationLocation.split(','),
+                distance: scheme.distance,
+                duration: scheme.duration,
+                price: scheme.price,
+                steps: []
+            };
+            for (var j = 0; j < scheme.steps.length; j++) {
+                var step = scheme.steps[j];
+                if (step.path == "") continue;
+                routes[i].steps[j] = {
+                    path: step.path.split(';').map(function (item) {
+                        return item.split(',');
+                    }),
+                    start: step.stepOriginLocation,
+                    end: step.stepDestinationLocation,
+                    distance: step.distance,
+                    type: step.type,
+                    vehicle: step.vehicle
+                };
+            }
+        }
+        return routes;
+    }
+};
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(78), __esModule: true };
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _isIterable2 = __webpack_require__(67);
+
+var _isIterable3 = _interopRequireDefault(_isIterable2);
+
+var _getIterator2 = __webpack_require__(4);
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = (0, _getIterator3.default)(arr), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if ((0, _isIterable3.default)(Object(arr))) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// getting tag from 19.1.3.6 Object.prototype.toString()
+var cof = __webpack_require__(32)
+  , TAG = __webpack_require__(3)('toStringTag')
+  // ES3 wrong here
+  , ARG = cof(function(){ return arguments; }()) == 'Arguments';
+
+// fallback for IE11 Script Access Denied error
+var tryGet = function(it, key){
+  try {
+    return it[key];
+  } catch(e){ /* empty */ }
+};
+
+module.exports = function(it){
+  var O, T, B;
+  return it === undefined ? 'Undefined' : it === null ? 'Null'
+    // @@toStringTag case
+    : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
+    // builtinTag case
+    : ARG ? cof(O)
+    // ES3 arguments fallback
+    : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+};
+
+/***/ }),
+/* 32 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -9664,11 +10165,11 @@ module.exports = function(it){
 };
 
 /***/ }),
-/* 20 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(11)
-  , document = __webpack_require__(0).document
+var isObject = __webpack_require__(19)
+  , document = __webpack_require__(5).document
   // in old IE typeof document.createElement is 'object'
   , is = isObject(document) && isObject(document.createElement);
 module.exports = function(it){
@@ -9676,7 +10177,7 @@ module.exports = function(it){
 };
 
 /***/ }),
-/* 21 */
+/* 34 */
 /***/ (function(module, exports) {
 
 // IE 8- don't enum bug keys
@@ -9685,99 +10186,31 @@ module.exports = (
 ).split(',');
 
 /***/ }),
-/* 22 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var global    = __webpack_require__(0)
-  , core      = __webpack_require__(6)
-  , ctx       = __webpack_require__(53)
-  , hide      = __webpack_require__(4)
-  , PROTOTYPE = 'prototype';
-
-var $export = function(type, name, source){
-  var IS_FORCED = type & $export.F
-    , IS_GLOBAL = type & $export.G
-    , IS_STATIC = type & $export.S
-    , IS_PROTO  = type & $export.P
-    , IS_BIND   = type & $export.B
-    , IS_WRAP   = type & $export.W
-    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
-    , expProto  = exports[PROTOTYPE]
-    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
-    , key, own, out;
-  if(IS_GLOBAL)source = name;
-  for(key in source){
-    // contains in native
-    own = !IS_FORCED && target && target[key] !== undefined;
-    if(own && key in exports)continue;
-    // export native or passed
-    out = own ? target[key] : source[key];
-    // prevent global pollution for namespaces
-    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
-    // bind timers to global for call from export context
-    : IS_BIND && own ? ctx(out, global)
-    // wrap global constructors for prevent change them in library
-    : IS_WRAP && target[key] == out ? (function(C){
-      var F = function(a, b, c){
-        if(this instanceof C){
-          switch(arguments.length){
-            case 0: return new C;
-            case 1: return new C(a);
-            case 2: return new C(a, b);
-          } return new C(a, b, c);
-        } return C.apply(this, arguments);
-      };
-      F[PROTOTYPE] = C[PROTOTYPE];
-      return F;
-    // make static versions for prototype methods
-    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
-    if(IS_PROTO){
-      (exports.virtual || (exports.virtual = {}))[key] = out;
-      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
-      if(type & $export.R && expProto && !expProto[key])hide(expProto, key, out);
-    }
-  }
-};
-// type bitmap
-$export.F = 1;   // forced
-$export.G = 2;   // global
-$export.S = 4;   // static
-$export.P = 8;   // proto
-$export.B = 16;  // bind
-$export.W = 32;  // wrap
-$export.U = 64;  // safe
-$export.R = 128; // real proto method for `library` 
-module.exports = $export;
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports) {
-
-module.exports = function(exec){
-  try {
-    return !!exec();
-  } catch(e){
-    return true;
-  }
+// fallback for non-array-like ES3 and non-enumerable old V8 strings
+var cof = __webpack_require__(32);
+module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
+  return cof(it) == 'String' ? it.split('') : Object(it);
 };
 
 /***/ }),
-/* 24 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var LIBRARY        = __webpack_require__(59)
-  , $export        = __webpack_require__(22)
-  , redefine       = __webpack_require__(64)
-  , hide           = __webpack_require__(4)
-  , has            = __webpack_require__(8)
-  , Iterators      = __webpack_require__(9)
-  , $iterCreate    = __webpack_require__(57)
-  , setToStringTag = __webpack_require__(27)
-  , getPrototypeOf = __webpack_require__(61)
-  , ITERATOR       = __webpack_require__(1)('iterator')
+var LIBRARY        = __webpack_require__(87)
+  , $export        = __webpack_require__(10)
+  , redefine       = __webpack_require__(95)
+  , hide           = __webpack_require__(6)
+  , has            = __webpack_require__(12)
+  , Iterators      = __webpack_require__(7)
+  , $iterCreate    = __webpack_require__(85)
+  , setToStringTag = __webpack_require__(39)
+  , getPrototypeOf = __webpack_require__(91)
+  , ITERATOR       = __webpack_require__(3)('iterator')
   , BUGGY          = !([].keys && 'next' in [].keys()) // Safari has buggy iterators w/o `next`
   , FF_ITERATOR    = '@@iterator'
   , KEYS           = 'keys'
@@ -9839,27 +10272,27 @@ module.exports = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED
 };
 
 /***/ }),
-/* 25 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-var anObject    = __webpack_require__(5)
-  , dPs         = __webpack_require__(60)
-  , enumBugKeys = __webpack_require__(21)
-  , IE_PROTO    = __webpack_require__(13)('IE_PROTO')
+var anObject    = __webpack_require__(8)
+  , dPs         = __webpack_require__(89)
+  , enumBugKeys = __webpack_require__(34)
+  , IE_PROTO    = __webpack_require__(22)('IE_PROTO')
   , Empty       = function(){ /* empty */ }
   , PROTOTYPE   = 'prototype';
 
 // Create object with fake `null` prototype: use iframe Object with cleared prototype
 var createDict = function(){
   // Thrash, waste and sodomy: IE GC bug
-  var iframe = __webpack_require__(20)('iframe')
+  var iframe = __webpack_require__(33)('iframe')
     , i      = enumBugKeys.length
     , lt     = '<'
     , gt     = '>'
     , iframeDocument;
   iframe.style.display = 'none';
-  __webpack_require__(54).appendChild(iframe);
+  __webpack_require__(83).appendChild(iframe);
   iframe.src = 'javascript:'; // eslint-disable-line no-script-url
   // createDict = iframe.contentWindow.Object;
   // html.removeChild(iframe);
@@ -9886,7 +10319,7 @@ module.exports = Object.create || function create(O, Properties){
 
 
 /***/ }),
-/* 26 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = function(bitmap, value){
@@ -9899,22 +10332,22 @@ module.exports = function(bitmap, value){
 };
 
 /***/ }),
-/* 27 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var def = __webpack_require__(12).f
-  , has = __webpack_require__(8)
-  , TAG = __webpack_require__(1)('toStringTag');
+var def = __webpack_require__(20).f
+  , has = __webpack_require__(12)
+  , TAG = __webpack_require__(3)('toStringTag');
 
 module.exports = function(it, tag, stat){
   if(it && !has(it = stat ? it : it.prototype, TAG))def(it, TAG, {configurable: true, value: tag});
 };
 
 /***/ }),
-/* 28 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var global = __webpack_require__(0)
+var global = __webpack_require__(5)
   , SHARED = '__core-js_shared__'
   , store  = global[SHARED] || (global[SHARED] = {});
 module.exports = function(key){
@@ -9922,7 +10355,7 @@ module.exports = function(key){
 };
 
 /***/ }),
-/* 29 */
+/* 41 */
 /***/ (function(module, exports) {
 
 var id = 0
@@ -9932,38 +10365,445 @@ module.exports = function(key){
 };
 
 /***/ }),
-/* 30 */
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $at  = __webpack_require__(96)(true);
+
+// 21.1.3.27 String.prototype[@@iterator]()
+__webpack_require__(36)(String, 'String', function(iterated){
+  this._t = String(iterated); // target
+  this._i = 0;                // next index
+// 21.1.5.2.1 %StringIteratorPrototype%.next()
+}, function(){
+  var O     = this._t
+    , index = this._i
+    , point;
+  if(index >= O.length)return {value: undefined, done: true};
+  point = $at(O, index);
+  this._i += point.length;
+  return {value: point, done: false};
+});
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(103);
+var global        = __webpack_require__(5)
+  , hide          = __webpack_require__(6)
+  , Iterators     = __webpack_require__(7)
+  , TO_STRING_TAG = __webpack_require__(3)('toStringTag');
+
+for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList', 'CSSRuleList'], i = 0; i < 5; i++){
+  var NAME       = collections[i]
+    , Collection = global[NAME]
+    , proto      = Collection && Collection.prototype;
+  if(proto && !proto[TO_STRING_TAG])hide(proto, TO_STRING_TAG, NAME);
+  Iterators[NAME] = Iterators.Array;
+}
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(Buffer) {/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap) {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+  var base64 = new Buffer(JSON.stringify(sourceMap)).toString('base64');
+  var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+  return '/*# ' + data + ' */';
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(71).Buffer))
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+  Modified by Evan You @yyx990803
+*/
+
+var hasDocument = typeof document !== 'undefined'
+
+if (typeof DEBUG !== 'undefined' && DEBUG) {
+  if (!hasDocument) {
+    throw new Error(
+    'vue-style-loader cannot be used in a non-browser environment. ' +
+    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
+  ) }
+}
+
+var listToStyles = __webpack_require__(131)
+
+/*
+type StyleObject = {
+  id: number;
+  parts: Array<StyleObjectPart>
+}
+
+type StyleObjectPart = {
+  css: string;
+  media: string;
+  sourceMap: ?string
+}
+*/
+
+var stylesInDom = {/*
+  [id: number]: {
+    id: number,
+    refs: number,
+    parts: Array<(obj?: StyleObjectPart) => void>
+  }
+*/}
+
+var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
+var singletonElement = null
+var singletonCounter = 0
+var isProduction = false
+var noop = function () {}
+
+// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+// tags it will allow on a page
+var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
+
+module.exports = function (parentId, list, _isProduction) {
+  isProduction = _isProduction
+
+  var styles = listToStyles(parentId, list)
+  addStylesToDom(styles)
+
+  return function update (newList) {
+    var mayRemove = []
+    for (var i = 0; i < styles.length; i++) {
+      var item = styles[i]
+      var domStyle = stylesInDom[item.id]
+      domStyle.refs--
+      mayRemove.push(domStyle)
+    }
+    if (newList) {
+      styles = listToStyles(parentId, newList)
+      addStylesToDom(styles)
+    } else {
+      styles = []
+    }
+    for (var i = 0; i < mayRemove.length; i++) {
+      var domStyle = mayRemove[i]
+      if (domStyle.refs === 0) {
+        for (var j = 0; j < domStyle.parts.length; j++) {
+          domStyle.parts[j]()
+        }
+        delete stylesInDom[domStyle.id]
+      }
+    }
+  }
+}
+
+function addStylesToDom (styles /* Array<StyleObject> */) {
+  for (var i = 0; i < styles.length; i++) {
+    var item = styles[i]
+    var domStyle = stylesInDom[item.id]
+    if (domStyle) {
+      domStyle.refs++
+      for (var j = 0; j < domStyle.parts.length; j++) {
+        domStyle.parts[j](item.parts[j])
+      }
+      for (; j < item.parts.length; j++) {
+        domStyle.parts.push(addStyle(item.parts[j]))
+      }
+      if (domStyle.parts.length > item.parts.length) {
+        domStyle.parts.length = item.parts.length
+      }
+    } else {
+      var parts = []
+      for (var j = 0; j < item.parts.length; j++) {
+        parts.push(addStyle(item.parts[j]))
+      }
+      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
+    }
+  }
+}
+
+function createStyleElement () {
+  var styleElement = document.createElement('style')
+  styleElement.type = 'text/css'
+  head.appendChild(styleElement)
+  return styleElement
+}
+
+function addStyle (obj /* StyleObjectPart */) {
+  var update, remove
+  var styleElement = document.querySelector('style[data-vue-ssr-id~="' + obj.id + '"]')
+
+  if (styleElement) {
+    if (isProduction) {
+      // has SSR styles and in production mode.
+      // simply do nothing.
+      return noop
+    } else {
+      // has SSR styles but in dev mode.
+      // for some reason Chrome can't handle source map in server-rendered
+      // style tags - source maps in <style> only works if the style tag is
+      // created and inserted dynamically. So we remove the server rendered
+      // styles and inject new ones.
+      styleElement.parentNode.removeChild(styleElement)
+    }
+  }
+
+  if (isOldIE) {
+    // use singleton mode for IE9.
+    var styleIndex = singletonCounter++
+    styleElement = singletonElement || (singletonElement = createStyleElement())
+    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
+    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
+  } else {
+    // use multi-style-tag mode in all other cases
+    styleElement = createStyleElement()
+    update = applyToTag.bind(null, styleElement)
+    remove = function () {
+      styleElement.parentNode.removeChild(styleElement)
+    }
+  }
+
+  update(obj)
+
+  return function updateStyle (newObj /* StyleObjectPart */) {
+    if (newObj) {
+      if (newObj.css === obj.css &&
+          newObj.media === obj.media &&
+          newObj.sourceMap === obj.sourceMap) {
+        return
+      }
+      update(obj = newObj)
+    } else {
+      remove()
+    }
+  }
+}
+
+var replaceText = (function () {
+  var textStore = []
+
+  return function (index, replacement) {
+    textStore[index] = replacement
+    return textStore.filter(Boolean).join('\n')
+  }
+})()
+
+function applyToSingletonTag (styleElement, index, remove, obj) {
+  var css = remove ? '' : obj.css
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = replaceText(index, css)
+  } else {
+    var cssNode = document.createTextNode(css)
+    var childNodes = styleElement.childNodes
+    if (childNodes[index]) styleElement.removeChild(childNodes[index])
+    if (childNodes.length) {
+      styleElement.insertBefore(cssNode, childNodes[index])
+    } else {
+      styleElement.appendChild(cssNode)
+    }
+  }
+}
+
+function applyToTag (styleElement, obj) {
+  var css = obj.css
+  var media = obj.media
+  var sourceMap = obj.sourceMap
+
+  if (media) {
+    styleElement.setAttribute('media', media)
+  }
+
+  if (sourceMap) {
+    // https://developer.chrome.com/devtools/docs/javascript-debugging
+    // this makes source maps inside style tags work properly in Chrome
+    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
+    // http://stackoverflow.com/a/26603875
+    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
+  }
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild)
+    }
+    styleElement.appendChild(document.createTextNode(css))
+  }
+}
+
+
+/***/ }),
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _vue = __webpack_require__(16);
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _vue2 = _interopRequireDefault(_vue);
+var _FindTask = __webpack_require__(62);
 
-var _bus = __webpack_require__(80);
+var _FindTask2 = _interopRequireDefault(_FindTask);
 
-var _bus2 = _interopRequireDefault(_bus);
+var _FindParameters = __webpack_require__(61);
 
-var _bus3 = __webpack_require__(3);
+var _FindParameters2 = _interopRequireDefault(_FindParameters);
 
-var _bus4 = _interopRequireDefault(_bus3);
+var _IdentifyTask = __webpack_require__(64);
+
+var _IdentifyTask2 = _interopRequireDefault(_IdentifyTask);
+
+var _IdentifyParameters = __webpack_require__(63);
+
+var _IdentifyParameters2 = _interopRequireDefault(_IdentifyParameters);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
- * businfo search control
- * @param options  {map: required, panel: required}
+ * Created by Administrator on 2017/5/9/009.
+ */
+exports.default = {
+    FindTask: _FindTask2.default,
+    FindParameters: _FindParameters2.default,
+    IdentifyTask: _IdentifyTask2.default,
+    IdentifyParameters: _IdentifyParameters2.default
+};
+
+/***/ }),
+/* 47 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _getIterator2 = __webpack_require__(4);
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+var _create = __webpack_require__(17);
+
+var _create2 = _interopRequireDefault(_create);
+
+var _vue = __webpack_require__(13);
+
+var _vue2 = _interopRequireDefault(_vue);
+
+var _bus = __webpack_require__(111);
+
+var _bus2 = _interopRequireDefault(_bus);
+
+var _bus3 = __webpack_require__(2);
+
+var _bus4 = _interopRequireDefault(_bus3);
+
+var _BaseRoute = __webpack_require__(15);
+
+var _BaseRoute2 = _interopRequireDefault(_BaseRoute);
+
+var _restConfig = __webpack_require__(16);
+
+var _restConfig2 = _interopRequireDefault(_restConfig);
+
+var _BuslineParse = __webpack_require__(28);
+
+var _BuslineParse2 = _interopRequireDefault(_BuslineParse);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by wake on 2017/4/7/007.
+ */
+
+Busline.prototype = (0, _create2.default)(_BaseRoute2.default.prototype);
+
+/**
+ * 公交轨迹查询构造函数
+ * @param {Object} options 组件参数
+ * @param {ol.Map} options.map 地图实例对象
+ * @param {String} options.panel 组件div的id
  * @constructor
  */
 function Busline(options) {
-    options = options || {};
-    this._transferUrl = Busline.BUS_TRANSFER_URL + ("ak=" + Busline.ak + "&v=" + Busline.version + "&");
-    this._panel = options.panel;
-    options.map instanceof ol.Map ? this._map = options.map : console.log('the attr map of options is required'); //required
-    this._gpsType = options.gpsType || 'gcj02';
-    // this._isConvert = this._gpsType != LD.Constants.PS_GCJ02;
+    _BaseRoute2.default.call(this, options);
+    this._transferUrl = _restConfig2.default.routeBusUrl + _restConfig2.default.ak;
     this.busLayer = new ol.layer.Vector({
         source: new ol.source.Vector(),
         style: new ol.style.Style({
@@ -9984,149 +10824,31 @@ function Busline(options) {
             })
         })
     });
-    this.iconLayer = new ol.layer.Vector({
-        source: new ol.source.Vector()
-    });
-    this.overlay;
-    this._map.addLayer(this.iconLayer);
     this._map.addLayer(this.busLayer);
     this._map.addLayer(this.walkLayer);
-    this._addInteration();
-    //this.setTactics(options.tactics);
-    // this.setCoordType(options.coordType)
-} /**
-   * Created by wake on 2017/4/7/007.
-   */
-
-;
-
-Busline.prototype.search = function (startPoint, endPoint) {
-    var self = this,
-        queryParams = Busline.ak + '&' + Busline.version + "&";
-    queryParams += "origin=" + startPoint.join(',') + "&destination=" + endPoint.join(',');
-    queryParams += "&coord_type=" + self._gpsType + "&out_coord_type=" + self._gpsType;
-    var url = Busline.BUS_TRANSFER_URL + queryParams;
-    self._requestData(url, function (status, message) {
-        self._initPanel();
-    });
+    this._setSelect();
 };
 
 Busline.prototype._initPanel = function () {
     var self = this;
-    var data = this._responseData;
     var el = this._panel;
+    var route = _BuslineParse2.default.parse(this._responseData);
     "string" == typeof this._panel && (this._panel = document.getElementById(this._panel));
     this._panel.innerHTML = "<app-Bus v-bind:data-msg='dataMsg' ></app-Bus>";
     this._app = new _vue2.default({
         el: '#' + el,
         data: {
-            dataMsg: data
+            dataMsg: route
         },
         components: {
             appBus: _bus2.default
-        },
-        methods: {
-            // initEvt : function (routes) {
-            //     self._initEvent(routes);
-            // }
         }
     });
 
     _bus4.default.$on('draw', this._draw.bind(self));
-
-    // console.log(this._app);
-    /* var divHtml = '<div class="chose_four"><ul class="chose_four_li">',
-     routes = [];*/
-    // success 状态码
-    /*if (0 == data.status) {
-     for (var i = 0; i < data.result.routes.length; i++) {
-     var scheme = data.result.routes[i].scheme[0];
-     routes[i] = {
-     start: scheme.originLocation,
-     end: scheme.destinationLocation,
-     steps: []
-     };
-     var busNames = [], buslines = "", l;
-     for (l in scheme.steps) {
-     var item = scheme.steps[l];
-     if (null != item.vehicle.name) { // 获取公交线路名称
-     var name = item.vehicle.name
-     , type = item.vehicle.type
-     , station = name.substring(name.indexOf("("))
-     , name = name.slice(0, name.indexOf("("));
-     0 == type && (name += "路",
-     item.vehicle.name = name + station);
-     busNames.push(name);
-     }
-     }
-     0 < busNames.length && (buslines = busNames.join(" - "));
-     var aLi = [];
-     for (l = 0; l < scheme.steps.length; l++) {
-     var step = scheme.steps[l];
-     routes[i].steps[l] = {
-     path: step.path,
-     start: step.stepOriginLocation,
-     end: step.stepDestinationLocation,
-     type: step.type,
-     schemaStep: step
-     };
-     var walkOrBushtml = this._getWalkOrBusHtml(step, l, scheme.steps);
-     if (walkOrBushtml == undefined) {
-     continue;
-     }
-     aLi.push(walkOrBushtml);
-     }
-     divHtml = this._getSchemaHtml(divHtml, aLi, i, buslines, scheme);
-     }
-     if (this._panel.nodeType === 1) {
-     divHtml += "</ul></div>";
-     this._panel.innerHTML = divHtml;
-     this._initEvent(routes);
-     }
-     }*/
 };
 
-Busline.prototype._getWalkOrBusHtml = function (step, index, steps) {
-    if (step.path != "") {
-        var html = "";
-        // walk or bus
-        if (5 == step.type) {
-            var li = '<li class="line_long03"><p class="round" style="background:url(' + Busline.STATIC_URL + 'images/round_03.png)0 0 no-repeat;" ></p><p><span>步行至 <b class="path_end">' + (null == steps[index + 1] ? "目的地" : steps[index + 1].vehicle.start_name) + "</b></span><font>" + this._getUnit(step.distance) + "</font></p></li>";
-            step.liHtml = li;
-            html = '<ul class="line_long" data-step-index="' + index + '">' + li + "</ul>";
-        } else {
-            li = '<li class="line_long02"><p class="round" style="background:url(' + Busline.STATIC_URL + 'images/round_03.png)0 0 no-repeat;"></p><p>' + ('<span class="path_line">' + step.vehicle.name + '</span><br/><b class="path_start">' + step.vehicle.start_name + '</b> 上车<br/><b class="path_end">' + step.vehicle.end_name + "</b> 下车") + "<font>" + (parseInt(step.vehicle.stop_num) + 1) + "站</font></p></li>";
-            step.liHtml = li;
-            html = '<ul class="line_long_shi" data-step-index="' + index + '">' + li + "</ul>";
-        }
-        return html;
-    }
-};
-
-Busline.prototype._getSchemaHtml = function (divHtml, aLi, i, buslines, scheme) {
-    var schemaHtml = '<li class="scheme" isopen="false" data-index="' + i + '">' + ("<font>" + (i + 1) + "</font>") + '<form class="bus_line"><p class="bus_line_left"><font class="address">' + (buslines || "没有乘车") + '</font><font class="detailed_information">' + this._getUnit(scheme.distance) + '</font></p><span class="open"><img src="' + Busline._MAP_IS_DEFIMG_URL + '" class="shouqi" style="background: rgba(0, 0, 0, 0) url(' + Busline.STATIC_URL + 'images/search_03.png);background-position: -266px -44px;"></span></form></li>';
-    if (this._panel) {
-        var detailHtml = '<li class="lin_left_x" style="display: none;"><span class="begin">起</span><div class="qi_x"><p><b>起点</b></p></div>';
-        for (var item in aLi) {
-            detailHtml += aLi[item];
-        }
-        divHtml += schemaHtml + (detailHtml + '<span class="end">终</span><div class="end_x">终点</div></li>');
-        return divHtml;
-    }
-};
-
-Busline.prototype._getUnit = function (num) {
-    return num = 1E3 < num ? (num / 1E3).toFixed(2) + "公里" : num + "米";
-};
-
-Busline.prototype._initEvent = function () {
-    var aLiScheme = document.getElementsByClassName("scheme");
-    if (aLiScheme[0]) {
-        aLiScheme[0].dispatchEvent(new MouseEvent('click'));
-    }
-};
-
-Busline.prototype._addInteration = function () {
+Busline.prototype._setSelect = function () {
     var self = this;
     var selectWalk = new ol.interaction.Select({
         condition: ol.events.condition.click,
@@ -10141,8 +10863,6 @@ Busline.prototype._addInteration = function () {
             return layer == self.walkLayer;
         }
     });
-    this._map.addInteraction(selectWalk);
-
     var selectBus = new ol.interaction.Select({
         condition: ol.events.condition.click,
         style: new ol.style.Style({
@@ -10152,118 +10872,69 @@ Busline.prototype._addInteration = function () {
             })
         }),
         filter: function filter(feature, layer) {
-            return layer == self.busLayer;
+            return layer != self.iconLayer;
         }
     });
-
-    this._map.addInteraction(selectBus);
-    self._addPopup([selectWalk, selectBus]);
-};
-
-/**
- *
- * @param selects
- * @type  Array.{ol.interation.Select}
- * @private
- */
-Busline.prototype._addPopup = function (selects) {
-    var self = this;
-    var elemPopup = document.createElement('div');
-    elemPopup.id = "leador-popup";
-    elemPopup.className = "leador-ol-popup";
-    elemPopup.innerHTML = '<a href="#" id="leador-popup-closer" class="leador-ol-popup-closer"></a> <div id="leador-popup-content"></div>';
-    document.body.appendChild(elemPopup);
-    var container = document.getElementById('leador-popup');
-    var content = document.getElementById('leador-popup-content');
-    var closer = document.getElementById('leador-popup-closer');
-    this.overlay = new ol.Overlay( /** @type {olx.OverlayOptions} */{
-        element: container,
-        autoPan: true,
-        autoPanAnimation: {
-            duration: 250
-        }
-    });
-    /**
-     * Add a click handler to hide the popup.
-     * @return {boolean} Don't follow the href.
-     */
-    closer.onclick = function () {
-        self.overlay.setPosition(undefined);
-        closer.blur();
-        return false;
-    };
-    this._map.addOverlay(this.overlay);
-    selects.forEach(function (select) {
-        select.on('select', function (e) {
-            if (e.selected[0]) {
-                // console.log(e);
-                var step = e.selected[0].getProperties()["step"];
-                var coordinate = e.mapBrowserEvent.coordinate;
-                content.innerHTML = '<ul class="line_long">' + step.schemaStep.dom.innerHTML + "</ul>";
-                self.overlay.setPosition(coordinate);
-            } else {
-                // close the overlay
-                closer.dispatchEvent(new MouseEvent('click'));
-            }
-        });
-    });
-};
-
-/**
- *
- * @param url
- * @param callback
- * @private
- */
-Busline.prototype._requestData = function (url, callback) {
-    this._responseData = {};
-    var self = this;
-    // var client = new XMLHttpRequest(),
-    //     self = this;
-    // client.addEventListener('load', function () {
-    //     var json = JSON.parse(this.responseText);
-    //     self._responseData = json;
-    //     callback.call(self, json.status, 0 == json.status ? json : json.message);
-    // });
-    // client.addEventListener('error', function () {
-    //     throw(new Error('Failed to fetch ' + url));
-    // });
-    // client.open('GET', url);
-    // client.send();
-    this.HTTPJsonP(url, function (json) {
-        self._responseData = json;
-        callback.call(self, json.status, 0 == json.status ? json : json.message);
-    });
-};
-
-Busline.prototype.HTTPJsonP = function (url, callback) {
-    var script = document.createElement('script');
-    var guid = "_" + Math.round(Math.random() * Math.pow(10, 6)) + "_";
-    script.type = 'text/javascript';
-    script.charset = 'utf-8';
-    script.src = url + "&callback=window." + guid;
-    window[guid] = function (data) {
-        window[guid] = null;
-        delete window[guid];
-        callback(data);
-        document.getElementsByTagName("head")[0].removeChild(script);
-    };
-    document.getElementsByTagName('head')[0].appendChild(script);
-};
-
-Busline.prototype._showSchemeLi = function (schemeLi, lin_leftLi, isopen) {
-    var flagImg = schemeLi.getElementsByClassName("shouqi")[0] || schemeLi.getElementsByClassName("open_x")[0];
-    "true" == isopen ? (schemeLi.setAttribute("isopen", "false"), lin_leftLi.style.display = "none", flagImg.className = "shouqi") : (schemeLi.setAttribute("isopen", "true"), lin_leftLi.style.display = "block", flagImg.className = "open_x");
+    this._addInteraction([selectBus]);
 };
 
 Busline.prototype._draw = function (route) {
-    this.clearLayers();
+    if (route) {
+        this.clearLayers();
+        this._redraw(route);
+    }
+};
+
+Busline.prototype._redraw = function (route) {
     var steps = route.steps;
-    var start = route.start.split(',');
-    var end = route.end.split(',');
     // 绘制起始位置和终止位置图标
-    this._drawIcon([{
-        point: start,
+    var aStyles = this._getStyle(route);
+    this._drawIcon(aStyles);
+    var walkFeatures = [];
+    var lineFeatures = [];
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+        for (var _iterator = (0, _getIterator3.default)(steps), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var step = _step.value;
+
+            if (step.type == 5) {
+                step.geometry = new ol.geom.LineString(step.path);
+                var walkFeature = new ol.Feature(step.geometry);
+                walkFeature.setProperties({ step: step });
+                walkFeatures.push(walkFeature);
+            } else {
+                step.geometry = new ol.geom.LineString(step.path);
+                var lineFeature = new ol.Feature(step.geometry);
+                lineFeature.setProperties({ step: step });
+                lineFeatures.push(lineFeature);
+            }
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+            }
+        } finally {
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
+    }
+
+    this.walkLayer.getSource().addFeatures(walkFeatures);
+    this.busLayer.getSource().addFeatures(lineFeatures);
+};
+
+Busline.prototype._getStyle = function (route) {
+    var passStyles = [];
+    passStyles.push({
+        point: route.start,
         image: new ol.style.Icon({
             src: 'http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png', // //../../assets/img/start.png
             anchor: [0.5, 1],
@@ -10271,9 +10942,9 @@ Busline.prototype._draw = function (route) {
             size: [24, 38],
             offset: [204, 375]
         })
-    }, //
-    {
-        point: end,
+    });
+    passStyles.push({
+        point: route.end,
         image: new ol.style.Icon({
             src: 'http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png', // //../../assets/img/start.png
             anchor: [0.5, 1],
@@ -10281,34 +10952,13 @@ Busline.prototype._draw = function (route) {
             size: [24, 38],
             offset: [269, 375]
         })
-    } //http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png
-    ]);
-    var walkFeatures = [];
-    var lineFeatures = [];
-    for (var step in steps) {
-        if (steps[step].type == 5) {
-            if (steps[step].path == "") continue;
-            steps[step].geometry = this._parseToGeometry(steps[step].path);
-            var walkFeature = new ol.Feature({
-                geometry: steps[step].geometry
-            });
-            walkFeature.setProperties({ step: steps[step] });
-            walkFeatures.push(walkFeature);
-            //this.walkLayer.getSource().addFeature(walkFeature);
-        } else {
-            steps[step].geometry = this._parseToGeometry(steps[step].path);
-            var lineFeature = new ol.Feature(steps[step].geometry);
-            lineFeature.setProperties({ step: steps[step] });
-            lineFeatures.push(lineFeature);
-            //this.busLayer.getSource().addFeature(lineFeature)；
-        }
-    }
-    this.walkLayer.getSource().addFeatures(walkFeatures);
-    this.busLayer.getSource().addFeatures(lineFeatures);
-
-    //this._addInteration();
+    });
+    return passStyles;
 };
 
+/**
+ * 清除所有图层
+ */
 Busline.prototype.clearLayers = function () {
     this.walkLayer.getSource().clear();
     this.busLayer.getSource().clear();
@@ -10343,72 +10993,48 @@ Busline.prototype._drawIcon = function (pointCollection) {
     }
 };
 
-Busline.prototype._parseToGeometry = function (path) {
-    var path = path.split(";");
-    var lineString = [];
-    for (var i = 0; i < path.length; i++) {
-        var point = path[i].split(",");
-        point[0] = parseFloat(point[0]);
-        point[1] = parseFloat(point[1]);
-        lineString.push(point);
-    }
-    return new ol.geom.LineString(lineString);
-};
-// ishow rest
-Busline.BUS_TRANSFER_URL = "http://api.ishowchina.com/v3/route/bus?";
-
-// ishow key
-Busline.ak = "ak=ec85d3648154874552835438ac6a02b2";
-
-// ishow version
-Busline.version = "v=3.4.3";
-
-Busline.STATIC_URL = "http://webapi.ishowchina.com/jsmap/3.4.3/";
-
-Busline._MAP_IS_SEARCH_URL = "images/search_03.png";
-
-Busline._MAP_IS_DEFIMG_URL = "images/img_1.gif";
-
 module.exports = Busline;
 
 /***/ }),
-/* 31 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _getIterator2 = __webpack_require__(18);
+var _getIterator2 = __webpack_require__(4);
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
 
-var _create = __webpack_require__(43);
+var _create = __webpack_require__(17);
 
 var _create2 = _interopRequireDefault(_create);
 
-var _bus = __webpack_require__(3);
+var _bus = __webpack_require__(2);
 
 var _bus2 = _interopRequireDefault(_bus);
 
-var _vue = __webpack_require__(16);
+var _vue = __webpack_require__(13);
 
 var _vue2 = _interopRequireDefault(_vue);
 
-var _Car = __webpack_require__(83);
+var _Car = __webpack_require__(114);
 
 var _Car2 = _interopRequireDefault(_Car);
 
-var _restConfig = __webpack_require__(40);
+var _restConfig = __webpack_require__(16);
 
 var _restConfig2 = _interopRequireDefault(_restConfig);
 
-var _BaseRoute = __webpack_require__(39);
+var _BaseRoute = __webpack_require__(15);
 
 var _BaseRoute2 = _interopRequireDefault(_BaseRoute);
 
-var _CarlineParse = __webpack_require__(42);
+var _CarlineParse = __webpack_require__(65);
 
 var _CarlineParse2 = _interopRequireDefault(_CarlineParse);
 
@@ -10420,6 +11046,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 Car.prototype = (0, _create2.default)(_BaseRoute2.default.prototype);
 
+/**
+ * @param {Object} options 组件参数
+ * @param {ol.Map} options.map 地图实例对象
+ * @param {String} options.panel 组件div的id
+ * @constructor
+ */
 function Car(options) {
     _BaseRoute2.default.call(this, options);
     this._transferUrl = _restConfig2.default.routeCarUrl + _restConfig2.default.ak;
@@ -10484,28 +11116,37 @@ Car.prototype._redraw = function (route) {
     var aStyles = this._getPasspoiStyle(route);
     this._drawIcon(aStyles);
     var carFeatures = [];
-    for (var _iterator = route.steps, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : (0, _getIterator3.default)(_iterator);;) {
-        var _ref;
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
-        if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref = _iterator[_i++];
-        } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref = _i.value;
+    try {
+        for (var _iterator = (0, _getIterator3.default)(route.steps), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var step = _step.value;
+
+            var geometry = new ol.geom.LineString(step.path);
+            var carFeature = new ol.Feature({
+                geometry: geometry
+            });
+            step.geometry = geometry;
+            carFeature.setProperties({ step: step });
+            carFeatures.push(carFeature);
         }
-
-        var step = _ref;
-
-        var geometry = new ol.geom.LineString(step.path);
-        var carFeature = new ol.Feature({
-            geometry: geometry
-        });
-        step.geometry = geometry;
-        carFeature.setProperties({ step: step });
-        carFeatures.push(carFeature);
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+            }
+        } finally {
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
     }
+
     this.carLayer.getSource().addFeatures(carFeatures);
 };
 
@@ -10550,6 +11191,9 @@ Car.prototype._getPasspoiStyle = function (route) {
     return passStyles;
 };
 
+/**
+ * 清除所有图层
+ */
 Car.prototype.clearLayer = function () {
     this.carLayer.getSource().clear();
     this.iconLayer.getSource().clear();
@@ -10563,61 +11207,249 @@ Car.prototype._moveTo = function (step) {
 exports.default = Car;
 
 /***/ }),
-/* 32 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _Busline = __webpack_require__(30);
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _Busline2 = _interopRequireDefault(_Busline);
+var _getIterator2 = __webpack_require__(4);
 
-var _Carline = __webpack_require__(31);
+var _getIterator3 = _interopRequireDefault(_getIterator2);
 
-var _Carline2 = _interopRequireDefault(_Carline);
+var _create = __webpack_require__(17);
 
-var _Walkline = __webpack_require__(96);
+var _create2 = _interopRequireDefault(_create);
 
-var _Walkline2 = _interopRequireDefault(_Walkline);
+var _bus = __webpack_require__(2);
+
+var _bus2 = _interopRequireDefault(_bus);
+
+var _vue = __webpack_require__(13);
+
+var _vue2 = _interopRequireDefault(_vue);
+
+var _walk = __webpack_require__(119);
+
+var _walk2 = _interopRequireDefault(_walk);
+
+var _restConfig = __webpack_require__(16);
+
+var _restConfig2 = _interopRequireDefault(_restConfig);
+
+var _BaseRoute = __webpack_require__(15);
+
+var _BaseRoute2 = _interopRequireDefault(_BaseRoute);
+
+var _WalklineParse = __webpack_require__(66);
+
+var _WalklineParse2 = _interopRequireDefault(_WalklineParse);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import ol from './src/ol3api/js/ol';
+/**
+ * Created by wake on 2017/4/7/007.
+ */
 
-var L = {
-  version: '1.0.0'
-}; /**
-    * Created by wake on 2017/4/7/007.
-    */
+Walkline.prototype = (0, _create2.default)(_BaseRoute2.default.prototype);
 
-L.Busline = _Busline2.default;
-L.Carline = _Carline2.default;
-L.Walkline = _Walkline2.default;
+/**
+ * 步行轨迹构造函数
+ * @param {ol.Map} options.map 地图实例对象
+ * @param {String} options.panel 组件div的id
+ * @param {Object} options 步行组件参数
+ * @constructor
+ */
+function Walkline(options) {
+    _BaseRoute2.default.call(this, options);
+    this._transferUrl = _restConfig2.default.routeWalkUrl + _restConfig2.default.ak;
+    this.walkLayer = new ol.layer.Vector({
+        source: new ol.source.Vector(),
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: '#0066FF',
+                width: 5
+            })
+        })
+    });
+    this._map.addLayer(this.walkLayer);
+    this._setSelect();
+}
 
-//console.log(Busline);
-//module.exports = L;
+/**
+ * 初始化面板
+ * @private
+ */
+Walkline.prototype._initPanel = function () {
+    var self = this;
+    var el = this._panel;
+    var route = _WalklineParse2.default.parse(this._responseData);
+    "string" == typeof this._panel && (this._panel = document.getElementById(this._panel));
+    this._panel.innerHTML = "<app-Walk v-bind:data-msg='dataMsg' ></app-Walk>";
+    this._app = new _vue2.default({
+        el: '#' + el,
+        data: {
+            dataMsg: route
+        },
+        components: {
+            appWalk: _walk2.default
+        }
+    });
+    _bus2.default.$on('moveTo', this._moveTo.bind(self));
+    this._draw(route);
+};
 
-window.L = L;
+/**
+ * 绘制路径
+ * @param {Object} route  路径数据
+ * @private
+ */
+Walkline.prototype._draw = function (route) {
+    if (route) {
+        this.clearLayer();
+        this._redraw(route);
+    }
+};
+
+/**
+ * 重绘
+ * @param {Object} route  路径数据
+ * @private
+ */
+Walkline.prototype._redraw = function (route) {
+    var aStyles = this._getPasspoiStyle(route);
+    this._drawIcon(aStyles);
+    var walkFeatures = [];
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+        for (var _iterator = (0, _getIterator3.default)(route.steps), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var step = _step.value;
+
+            var geometry = new ol.geom.LineString(step.path);
+            var walkFeature = new ol.Feature({
+                geometry: geometry
+            });
+            step.geometry = geometry;
+            walkFeature.setProperties({ step: step });
+            walkFeatures.push(walkFeature);
+        }
+    } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+            }
+        } finally {
+            if (_didIteratorError) {
+                throw _iteratorError;
+            }
+        }
+    }
+
+    this.walkLayer.getSource().addFeatures(walkFeatures);
+};
+
+/**
+ * 设置要素的交互
+ * @private
+ */
+Walkline.prototype._setSelect = function () {
+    var self = this;
+    var selectWalk = new ol.interaction.Select({
+        condition: ol.events.condition.click,
+        style: new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: "#0ae6fb",
+                lineDash: [8],
+                width: 5
+            })
+        }),
+        filter: function filter(feature, layer) {
+            return layer == self.walkLayer;
+        }
+    });
+    this._addInteraction([selectWalk]);
+};
+
+/**
+ * 清除所有图层
+ */
+Walkline.prototype.clearLayer = function () {
+    this.walkLayer.getSource().clear();
+    this.iconLayer.getSource().clear();
+};
+
+/**
+ * 获取 图标样式
+ * @param {Object} route 路径塑胶
+ * @returns {Array} 返回起始点和终止点的图标样式
+ * @private
+ */
+Walkline.prototype._getPasspoiStyle = function (route) {
+    var passStyles = [];
+    passStyles.push({
+        point: route.start,
+        image: new ol.style.Icon({
+            src: 'http://webapi.ishowchina.com/jsmap/3.4.3/images/point_1.png', // //../../assets/img/start.png
+            anchor: [0.5, 1],
+            // imgSize: [24, 38], // 203 380
+            size: [35, 30],
+            offset: [367, 0]
+        })
+    });
+    passStyles.push({
+        point: route.end,
+        image: new ol.style.Icon({
+            src: 'http://webapi.ishowchina.com/jsmap/3.4.3/images/point_1.png', // //../../assets/img/start.png
+            anchor: [0.5, 1],
+            size: [35, 30],
+            offset: [401, 0]
+        })
+    });
+    return passStyles;
+};
+
+/**
+ * 移动到当前选择的路段
+ * @param {Object} step 当前路段数据
+ * @private
+ */
+Walkline.prototype._moveTo = function (step) {
+    var geometry = step.geometry;
+    this._fly2Geometry(geometry);
+};
+
+exports.default = Walkline;
 
 /***/ }),
-/* 33 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _BuslineParse = __webpack_require__(41);
+var _BuslineParse = __webpack_require__(28);
 
 var _BuslineParse2 = _interopRequireDefault(_BuslineParse);
 
-var _scheme = __webpack_require__(82);
+var _scheme = __webpack_require__(113);
 
 var _scheme2 = _interopRequireDefault(_scheme);
 
-var _linLeft = __webpack_require__(81);
+var _linLeft = __webpack_require__(112);
 
 var _linLeft2 = _interopRequireDefault(_linLeft);
 
@@ -10628,38 +11460,13 @@ exports.default = {
     data: function data() {
         return {
             //dataMsg: this.dataMsg
-            routes: [],
-            status: this.dataMsg.status,
-            result: this.dataMsg.result
+            routes: this.dataMsg
         };
     },
 
     components: {
         busScheme: _scheme2.default,
         linLeft: _linLeft2.default
-    },
-    mounted: function mounted() {
-        console.log(this.dataMsg);
-        for (var i = 0; i < this.result.routes.length; i++) {
-            var scheme = this.result.routes[i].scheme[0];
-            this.routes[i] = {
-                start: scheme.originLocation,
-                end: scheme.destinationLocation,
-                steps: []
-            };
-            for (var j = 0; j < scheme.steps.length; j++) {
-                var step = scheme.steps[j];
-                this.routes[i].steps[j] = {
-                    path: step.path,
-                    start: step.stepOriginLocation,
-                    end: step.stepDestinationLocation,
-                    type: step.type,
-                    schemaStep: step
-                };
-            }
-        }
-
-        //            this.$emit('init-event',this.routes);
     }
 }; //
 //
@@ -10675,23 +11482,23 @@ exports.default = {
 //
 //
 //
-//
-//
 
 /***/ }),
-/* 34 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _bus = __webpack_require__(3);
+var _bus = __webpack_require__(2);
 
 var _bus2 = _interopRequireDefault(_bus);
 
-var _lodash = __webpack_require__(79);
+var _lodash = __webpack_require__(110);
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
@@ -10732,16 +11539,15 @@ exports.default = {
     props: ["route", "index"],
     data: function data() {
         return {
-            scheme: this.route.scheme[0],
             detailed: "",
             activeBlock: "none"
         };
     },
     mounted: function mounted() {
-        var scheme = this.route.scheme[0];
+
         var self = this;
         //this.detailed = this.getUnit(scheme.distance);
-        scheme.steps.forEach(function (step, idx) {
+        this.route.steps.forEach(function (step, idx) {
             var children = self.$el.children;
             var elems = _lodash2.default.filter(children, function (elem, index) {
                 return elem.tagName.toLowerCase() == 'ul';
@@ -10766,15 +11572,17 @@ exports.default = {
 };
 
 /***/ }),
-/* 35 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _bus = __webpack_require__(3);
+var _bus = __webpack_require__(2);
 
 var _bus2 = _interopRequireDefault(_bus);
 
@@ -10791,9 +11599,9 @@ exports.default = {
         };
     },
     mounted: function mounted() {
-        var scheme = this.route.scheme[0];
-        for (var l in scheme.steps) {
-            var item = scheme.steps[l];
+        var route = this.route;
+        for (var l in route.steps) {
+            var item = route.steps[l];
             if (null != item.vehicle.name) {
                 // 获取公交线路名称
                 var name = item.vehicle.name,
@@ -10805,14 +11613,9 @@ exports.default = {
             }
         }
         0 < this.busNames.length && (this.buslines = this.busNames.join(" - "));
-        this.detailed = this.getUnit(scheme.distance);
+        this.detailed = this.getUnit(route.distance);
     },
 
-    /*  updated: function() {
-          if(this.index == 0){
-              this.$el.dispatchEvent(new MouseEvent('click'));
-          }
-      },*/
     filters: {
         getBusline: function getBusline(lines) {
             if (lines) {
@@ -10851,15 +11654,17 @@ exports.default = {
 //
 
 /***/ }),
-/* 36 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _panelCar = __webpack_require__(84);
+var _panelCar = __webpack_require__(115);
 
 var _panelCar2 = _interopRequireDefault(_panelCar);
 
@@ -10886,19 +11691,21 @@ exports.default = {
 //
 
 /***/ }),
-/* 37 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _panelCarTitlle = __webpack_require__(85);
+var _panelCarTitlle = __webpack_require__(116);
 
 var _panelCarTitlle2 = _interopRequireDefault(_panelCarTitlle);
 
-var _bus = __webpack_require__(3);
+var _bus = __webpack_require__(2);
 
 var _bus2 = _interopRequireDefault(_bus);
 
@@ -10982,13 +11789,15 @@ exports.default = {
 };
 
 /***/ }),
-/* 38 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 //
 //
 //
@@ -11026,211 +11835,566 @@ exports.default = {
 };
 
 /***/ }),
-/* 39 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
-/**
- * Created by Administrator on 2017/4/11/011.
- */
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-/**
- * Abstract Class
- * @param options
- * @constructor
- */
-function BaseRoute(options) {
-    options = options || {};
-    this._panel = options.panel;
-    options.map instanceof ol.Map ? this._map = options.map : console.error('the attr map of options is required'); //required
-    //this.overlay;
-    this.iconLayer = new ol.layer.Vector({
-        source: new ol.source.Vector()
-    });
-    this._map.addLayer(this.iconLayer);
-    this._setPopup();
-}
+var _panelWalkTitle = __webpack_require__(118);
 
-BaseRoute.prototype.search = function (startPoint, endPoint) {
-    var self = this;
-    var url = this._transferUrl + "&origin=" + startPoint.join(',') + "&destination=" + endPoint.join(',');
-    self._requestData(url, function (status, message) {
-        if (status == 0) {
-            self._responseData = message;
-            self._initPanel();
-        } else {
-            throw Error(message);
-        }
-    });
-};
+var _panelWalkTitle2 = _interopRequireDefault(_panelWalkTitle);
 
-BaseRoute.prototype._requestData = function (url, cb) {
-    this._responseData = {};
-    var self = this;
-    this.HTTPJsonP(url, function (json) {
-        cb.call(self, json.status, 0 == json.status ? json : json.message);
-    });
-};
+var _bus = __webpack_require__(2);
 
-BaseRoute.prototype.HTTPJsonP = function (url, callback) {
-    var script = document.createElement('script');
-    var guid = "_" + Math.round(Math.random() * Math.pow(10, 6)) + "_";
-    script.type = 'text/javascript';
-    script.charset = 'utf-8';
-    script.src = url + "&callback=window." + guid;
-    window[guid] = function (data) {
-        window[guid] = null;
-        delete window[guid];
-        callback(data);
-        document.getElementsByTagName("head")[0].removeChild(script);
-    };
-    document.getElementsByTagName('head')[0].appendChild(script);
-};
+var _bus2 = _interopRequireDefault(_bus);
 
-BaseRoute.prototype._drawIcon = function (pointCollection) {
-    var self = this;
-    if (Array.isArray(pointCollection)) {
-        pointCollection.forEach(function (item) {
-            var anchor = new ol.Feature({
-                geometry: new ol.geom.Point(item.point)
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+    props: ['routes'],
+    data: function data() {
+        return {
+            steps: this.routes.steps,
+            distance: this.routes.distance,
+            duration: this.routes.duration,
+            stationsName: [],
+            bgImg: "bgImg",
+            tactics: this.routes.tactics
+        };
+    },
+
+    components: {
+        walkHeader: _panelWalkTitle2.default
+    },
+    mounted: function mounted() {
+        var self = this;
+        if (this.steps.length > 1) {
+            this.steps.forEach(function (item, idx) {
+                self.stationsName.push(item.instruction);
             });
-            anchor.setStyle(new ol.style.Style({
-                image: item.image
-            }));
-            self.iconLayer.getSource().addFeature(anchor);
+        }
+        //            console.log(this.routes)
+        this.steps.forEach(function (step, idx) {
+            var children = document.querySelectorAll('#driving-showHighlight');
+            step.dom = children[idx];
         });
-    } else {
-        var anchor = new ol.Feature({
-            geometry: new ol.geom.Point(pointCollection.point)
-        });
-        anchor.setStyle(new ol.style.Style({
-            image: pointCollection.image
-        }));
-        self.iconLayer.getSource().addFeature(anchor);
+    },
+
+    methods: {
+        getUnit: function getUnit(num) {
+            return num = 1E3 < num ? (num / 1E3).toFixed(2) + "公里" : num + "米";
+        },
+        moveTo: function moveTo(step) {
+            //console.log(step);
+            _bus2.default.$emit('moveTo', step);
+        }
     }
 };
 
-BaseRoute.prototype._addInteraction = function (aSelect) {
-    var self = this;
-    self._selects = aSelect;
-    aSelect.forEach(function (select) {
-        self._map.addInteraction(select);
-        select.on('select', function (e) {
-            if (e.selected[0]) {
-                // console.log(e);
-                var step = e.selected[0].getProperties()["step"];
-                var coordinate = e.mapBrowserEvent.coordinate;
-                self._content.innerHTML = step.dom.innerHTML;
-                self.overlay.setPosition(coordinate);
-            } else {
-                // close the overlay
-                self._closer.dispatchEvent(new MouseEvent('click'));
-            }
-        });
-    });
-};
-
-BaseRoute.prototype._setPopup = function () {
-    var self = this;
-    var elemPopup = document.createElement('div');
-    elemPopup.id = "leador-popup";
-    elemPopup.className = "leador-ol-popup";
-    elemPopup.innerHTML = '<a href="#" id="leador-popup-closer" class="leador-ol-popup-closer"></a> <div id="leador-popup-content"></div>';
-    document.body.appendChild(elemPopup);
-    var container = document.getElementById('leador-popup');
-    var content = document.getElementById('leador-popup-content');
-    var closer = document.getElementById('leador-popup-closer');
-    this._content = content;
-    this._closer = closer;
-    this.overlay = new ol.Overlay( /** @type {olx.OverlayOptions} */{
-        element: container,
-        autoPan: true,
-        autoPanAnimation: {
-            duration: 250
-        }
-    });
-    closer.onclick = function () {
-        self.overlay.setPosition(undefined);
-        closer.blur();
-        self._selects.forEach(function (select) {
-            select.getFeatures().clear();
-        });
-        return false;
-    };
-    this._map.addOverlay(this.overlay);
-};
-
-//var geoExtent = geometry.getExtent();
-BaseRoute.prototype._fly2Geometry = function (geometry) {
-    var extent = geometry.getExtent();
-    var view = this._map.getView();
-    /*
-     4.0.0 release simplified ol.view#fit() API
-    view.fit(extent, {
-        size: this._map.getSize(),
-        duration: 2000,
-        easing: ol.easing.inAndOut
-    })*/
-
-    /**
-     * 3.20.0 old API
-     */
-    view.fit(extent, this._map.getSize(), {
-        duration: 2000,
-        easing: ol.easing.inAndOut
-    });
-};
-
-exports.default = BaseRoute;
-
 /***/ }),
-/* 40 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
-/**
- * Created by Administrator on 2017/4/10/010.
- */
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 exports.default = {
-    routeBusUrl: "http://api.ishowchina.com/v3/route/bus?",
-    routeCarUrl: "http://api.ishowchina.com/v3/route/car?", // 服务api地址
-    routeWalkUrl: "http://api.ishowchina.com/v3/route/walk?",
-    ak: "ak=ec85d3648154874552835438ac6a02b2",
-    version: "v=3.4.3",
-    STATIC_URL: "http://webapi.ishowchina.com/jsmap/3.4.3/"
+    props: ["distance", "duration", "names", "tactics"],
+    data: function data() {
+        return {
+            dist: this.distance,
+            tac: this.tactics
+        };
+    },
+
+    methods: {
+        getUnit: function getUnit(num) {
+            return num = 1E3 < num ? (num / 1E3).toFixed(2) + "公里" : num + "米";
+        },
+        getMin: function getMin(num) {
+            return num = 3600 < num ? Math.floor(num / 3600) + "小时" + num % 3600 / 60 + "分钟" : num / 60 + "分钟";
+        },
+        getTitlle: function getTitlle(names) {
+            if (names.length > 4) {
+                return names.slice(0, 2).join('>') + '......' + names.slice(names.length - 2).join('>');
+            } else {
+                return names.join('>');
+            }
+        }
+    }
 };
 
 /***/ }),
-/* 41 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
-/**
- * Created by Administrator on 2017/4/10/010.
- */
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-exports.default = {};
+var _panelWalk = __webpack_require__(117);
+
+var _panelWalk2 = _interopRequireDefault(_panelWalk);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+    props: ["dataMsg"],
+    data: function data() {
+        return {
+            routes: this.dataMsg
+        };
+    },
+    mounted: function mounted() {},
+
+    components: {
+        panelWalk: _panelWalk2.default
+    }
+}; //
+//
+//
+//
+//
+//
+//
 
 /***/ }),
-/* 42 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
-var _getIterator2 = __webpack_require__(18);
+var _lang = __webpack_require__(133);
+
+var _lang2 = _interopRequireDefault(_lang);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+    setAttr: function setAttr(ele, key, attr) {
+        ele = this.$(ele);
+        ele.setAttribute(key, attr);
+        return ele;
+    },
+
+    setAttrs: function setAttrs(ele, attrs) {
+        ele = this.$(ele);
+        for (var key in attrs) {
+            this.setAttr(ele, key, attrs(key));
+        }
+        return ele;
+    },
+
+    $: function $(id) {
+        if (_lang2.default.isString(id)) {
+            return document.getElementById(id);
+        } else if (id && id.nodeName) {
+            return id;
+        }
+        return null;
+    }
+}; /**
+    * Created by Administrator on 2017/5/8/008.
+    */
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _extends2 = __webpack_require__(27);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _index = __webpack_require__(135);
+
+var _index2 = _interopRequireDefault(_index);
+
+var _index3 = __webpack_require__(46);
+
+var _index4 = _interopRequireDefault(_index3);
+
+var _index5 = __webpack_require__(134);
+
+var _index6 = _interopRequireDefault(_index5);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// import ol from './src/ol3api/js/ol';
+
+var L = (0, _extends3.default)({
+    version: '1.0.1'
+}, _index6.default, _index2.default, _index4.default);
+
+//console.log(Busline);
+//module.exports = L;
+
+/**
+ * Created by wake on 2017/4/7/007.
+ */
+
+module.exports = window.L = L;
+
+/***/ }),
+/* 61 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+/**
+ * Created by wake on 2017/5/9/009.
+ */
+
+function FindParameters() {
+    this.layerIds = null;
+    this.returnGeometry = !1;
+    this.searchText = "";
+    this.searchFields = "";
+    this.spatialReference = null;
+    this.layers = null;
+    this.contains = !0;
+    this.layerDefinitions = null;
+    this.outSpatialReference = null; // 输出几何的 投影
+    this.dynamicLayerInfos = null;
+}
+
+var p = FindParameters.prototype;
+
+p.toJson = function () {
+    var result = {
+        f: "json",
+        searchText: this.searchText,
+        contains: this.contains,
+        returnGeometry: this.returnGeometry,
+        sr: this.outSpatialReference,
+        searchFields: this.searchFields.join(','),
+        layers: this.layerIds.join(',')
+    };
+    return result;
+};
+
+exports.default = FindParameters;
+
+/***/ }),
+/* 62 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _keys = __webpack_require__(29);
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _index = __webpack_require__(134);
+
+var _index2 = _interopRequireDefault(_index);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function FindTask(url, options) {
+    this.serviceUrl = url + "/find?";
+    this.options = options || {};
+} /**
+   * Created by wake on 2017/5/9/009.
+   */
+
+
+var p = FindTask.prototype;
+
+p.execute = function (findParameters, callback) {
+    var _this = this;
+
+    var json = findParameters.toJson();
+    var self = this;
+    (0, _keys2.default)(json).forEach(function (item, i) {
+        _this.serviceUrl += item + "=" + json[item] + "&";
+    });
+    _index2.default.request(this.serviceUrl, function (data) {
+        callback.call(null, data);
+    });
+};
+
+exports.default = FindTask;
+
+/***/ }),
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _stringify = __webpack_require__(68);
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by Administrator on 2017/5/8/008.
+ */
+
+function IdentifyParameters() {
+    // identify 的 geometry
+    this.geometry = null;
+    this.spatialReference = null;
+    this.layerIds = null;
+    this.tolerance = null;
+    this.returnGeometry = !1;
+    // identify 的范围
+    this.mapExtent = null;
+    this.layerOption = IdentifyParameters.LAYER_OPTION_TOP;
+    this.width = 400;
+    this.height = 400;
+    this.dpi = 96;
+    this.searchText = "";
+    this.searchFields = ""; // 如果不指定， 默认只查displayField
+}
+
+var p = IdentifyParameters.prototype;
+
+p.toJson = function () {
+    var geometry = this.geometry,
+        extent = this.mapExtent,
+        spatialRef = this.spatialReference;
+    var result = {
+        f: "json",
+        geometry: (0, _stringify2.default)(this.toEsriGeometry(geometry)),
+        tolerance: this.tolerance,
+        returnGeometry: this.returnGeometry,
+        mapExtent: (0, _stringify2.default)(this.toEsriExtent(extent)),
+        imageDisplay: this.width + "," + this.height + "," + this.dpi,
+        geometryType: this.getGeometryType(geometry),
+        sr: spatialRef,
+        layers: this.layerOption + ":" + this.layerIds.join(','),
+        searchText: this.searchText,
+        searchFields: this.searchFields
+    };
+    return result;
+};
+
+p.toEsriGeometry = function (geometry) {
+    var type = geometry.getType();
+    var esriJson = new ol.format.EsriJSON();
+    switch (type) {
+        case "LineString":
+            return { paths: esriJson.writeGeometryObject(geometry).paths, spatialReference: { wkid: 4326 } };
+        case "Point":
+            return {
+                x: esriJson.writeGeometryObject(geometry).x,
+                y: esriJson.writeGeometryObject(geometry).y,
+                spatialReference: { wkid: 4326 }
+            };
+        case "Polygon":
+            return {
+                rings: esriJson.writeGeometryObject(geometry).rings,
+                spatialReference: { wkid: 4326 }
+            };
+        default:
+            break;
+    }
+};
+
+p.toEsriExtent = function (extent) {
+    return {
+        xmin: extent[0],
+        ymin: extent[1],
+        xmax: extent[2],
+        ymax: extent[3],
+        spatialReference: {
+            wkid: 4326
+        }
+    };
+};
+
+p.getGeometryType = function (geometry) {
+    var type = geometry.getType();
+    switch (type) {
+        case "LineString":
+            return "esriGeometryPolyline";
+        case "Point":
+            return "esriGeometryPoint";
+        case "Polygon":
+            return "esriGeometryPolygon";
+        default:
+            break;
+    }
+};
+
+IdentifyParameters.LAYER_OPTION_ALL = 'all';
+
+IdentifyParameters.LAYER_OPTION_TOP = 'top';
+
+exports.default = IdentifyParameters;
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _keys = __webpack_require__(29);
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _index = __webpack_require__(134);
+
+var _index2 = _interopRequireDefault(_index);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function IdentifyTask(url, options) {
+    this.serviceUrl = url + "/identify?";
+    this.options = options || {};
+} /**
+   * Created by Administrator on 2017/5/8/008.
+   */
+
+
+var p = IdentifyTask.prototype;
+
+p.execute = function (identifyParams, callback) {
+    var _this = this;
+
+    var json = identifyParams.toJson();
+    var self = this;
+    (0, _keys2.default)(json).forEach(function (item, i) {
+        _this.serviceUrl += item + "=" + json[item] + "&";
+    });
+    _index2.default.request(this.serviceUrl, function (data) {
+        if (data.results.error) {
+            callback.call(null, data);
+            console.warn("error ： ", data.results.error);
+        } else {
+            if (json.searchText != "") {
+                // 筛选出包含 key的数据
+                //Array.isArray(json.se)
+                if (json.searchFields != "") {
+                    var _a = data.results;
+                    _a = _a.filter(function (item) {
+                        for (var i = 0; i < json.searchFields.length; i++) {
+                            var flag = item.attributes[json.searchFields[i]] && item.attributes[json.searchFields[i]].includes(json.searchText);
+                            if (flag === true) {
+                                return true;
+                            } else {
+                                continue;
+                            }
+                        }
+                    });
+                    callback.call(null, { results: _a });
+                } else {
+                    var a = data.results;
+                    a = a.filter(function (item) {
+                        return item.value.includes(json.searchText);
+                    });
+                    callback.call(null, { results: a });
+                }
+            } else {
+                callback.call(null, data);
+            }
+        }
+    });
+};
+
+exports.default = IdentifyTask;
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _slicedToArray2 = __webpack_require__(30);
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+
+var _getIterator2 = __webpack_require__(4);
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
 
@@ -11254,32 +12418,40 @@ exports.default = {
             duration: data.result.routes[0].duration
         };
         var steps = data.result.routes[0].steps;
-        for (var _iterator = steps.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : (0, _getIterator3.default)(_iterator);;) {
-            var _ref;
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
 
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
+        try {
+            for (var _iterator = (0, _getIterator3.default)(steps.entries()), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var _step$value = (0, _slicedToArray3.default)(_step.value, 2),
+                    idx = _step$value[0],
+                    item = _step$value[1];
+
+                if (item.path == "") continue;
+                item.ispasspoi == 1 && route.passpoi.push([item.stepDestinationLocation.lng, item.stepDestinationLocation.lat]);
+                route.steps[idx] = {
+                    distance: item.distance,
+                    instruction: item.instruction,
+                    path: item.path.split(';').map(function (item) {
+                        return item.split(',');
+                    }), // Array.<ol.coordinate>
+                    turn: self.turn[item.turn]
+                };
             }
-
-            var _ref2 = _ref,
-                idx = _ref2[0],
-                item = _ref2[1];
-
-            if (item.path == "") continue;
-            item.ispasspoi == 1 && route.passpoi.push([item.stepDestinationLocation.lng, item.stepDestinationLocation.lat]);
-            route.steps[idx] = {
-                distance: item.distance,
-                instruction: item.instruction,
-                path: item.path.split(';').map(function (item) {
-                    return item.split(',');
-                }), // Array.<ol.coordinate>
-                turn: self.turn[item.turn]
-            };
+        } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                    _iterator.return();
+                }
+            } finally {
+                if (_didIteratorError) {
+                    throw _iteratorError;
+                }
+            }
         }
 
         return route;
@@ -11316,13 +12488,126 @@ exports.default = {
 };
 
 /***/ }),
-/* 43 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = { "default": __webpack_require__(48), __esModule: true };
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _slicedToArray2 = __webpack_require__(30);
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
+
+var _getIterator2 = __webpack_require__(4);
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by Administrator on 2017/4/14/014.
+ */
+
+exports.default = {
+    parse: function parse(data) {
+        var self = this;
+        var route = {
+            start: [data.result.origin.originPt.lng, data.result.origin.originPt.lat],
+            end: [data.result.destination.destinationPt.lng, data.result.destination.destinationPt.lat],
+            steps: [],
+            tactics: self.tactics[data.result.routes[0].tactics],
+            distance: data.result.routes[0].distance,
+            duration: data.result.routes[0].duration
+        };
+        var steps = data.result.routes[0].steps;
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+            for (var _iterator = (0, _getIterator3.default)(steps.entries()), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                var _step$value = (0, _slicedToArray3.default)(_step.value, 2),
+                    idx = _step$value[0],
+                    item = _step$value[1];
+
+                if (item.path == "") continue;
+                route.steps[idx] = {
+                    distance: item.distance,
+                    instruction: item.instruction,
+                    path: item.path.split(';').map(function (item) {
+                        return item.split(',');
+                    }), // Array.<ol.coordinate>
+                    turn: self.turn[item.turn]
+                };
+            }
+        } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion && _iterator.return) {
+                    _iterator.return();
+                }
+            } finally {
+                if (_didIteratorError) {
+                    throw _iteratorError;
+                }
+            }
+        }
+
+        return route;
+    },
+
+    tactics: {
+        11: "最少时间",
+        12: "最短路径"
+    },
+
+    turn: {
+        0: { message: '进入' },
+        1: { message: "直行", backgroundPosition: '-317px -75px' },
+        2: { message: '右前方转弯', backgroundPosition: '-302px -340px' },
+        3: { message: '右转', backgroundPosition: '-291px -102px' },
+        4: { message: '右后方转弯', backgroundPosition: '-291px -376px' },
+        5: { message: '掉头', backgroundPosition: '-268px -340px' },
+        6: { message: '左后方转弯', backgroundPosition: '-291px -400px' },
+        7: { message: '左转', backgroundPosition: '-293px -73px' },
+        8: { message: '左前方转弯', backgroundPosition: '-285px -340px' },
+        9: { message: '左侧', backgroundPosition: '' },
+        10: { message: '右侧', backgroundPosition: '-302px -340px' },
+        11: { message: '分歧-左', backgroundPosition: '' },
+        12: { message: '分歧中央', backgroundPosition: '' },
+        13: { message: '分歧右', backgroundPosition: '' },
+        14: { message: '环岛', backgroundPosition: '' },
+        15: { message: '进渡口', backgroundPosition: '' },
+        16: { message: '出渡口', backgroundPosition: '' }
+    }
+};
 
 /***/ }),
-/* 44 */
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(74), __esModule: true };
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(75), __esModule: true };
+
+/***/ }),
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(76), __esModule: true };
+
+/***/ }),
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11443,7 +12728,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 45 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11457,9 +12742,9 @@ function fromByteArray (uint8) {
 
 
 
-var base64 = __webpack_require__(44)
-var ieee754 = __webpack_require__(78)
-var isArray = __webpack_require__(46)
+var base64 = __webpack_require__(70)
+var ieee754 = __webpack_require__(109)
+var isArray = __webpack_require__(72)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -13237,10 +14522,10 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26)))
 
 /***/ }),
-/* 46 */
+/* 72 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -13251,25 +14536,57 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 47 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(75);
-__webpack_require__(74);
-module.exports = __webpack_require__(71);
+__webpack_require__(43);
+__webpack_require__(42);
+module.exports = __webpack_require__(101);
 
 /***/ }),
-/* 48 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(73);
-var $Object = __webpack_require__(6).Object;
+__webpack_require__(43);
+__webpack_require__(42);
+module.exports = __webpack_require__(102);
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var core  = __webpack_require__(0)
+  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
+module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+  return $JSON.stringify.apply($JSON, arguments);
+};
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(104);
+module.exports = __webpack_require__(0).Object.assign;
+
+/***/ }),
+/* 77 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(105);
+var $Object = __webpack_require__(0).Object;
 module.exports = function create(P, D){
   return $Object.create(P, D);
 };
 
 /***/ }),
-/* 49 */
+/* 78 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(106);
+module.exports = __webpack_require__(0).Object.keys;
+
+/***/ }),
+/* 79 */
 /***/ (function(module, exports) {
 
 module.exports = function(it){
@@ -13278,20 +14595,20 @@ module.exports = function(it){
 };
 
 /***/ }),
-/* 50 */
+/* 80 */
 /***/ (function(module, exports) {
 
 module.exports = function(){ /* empty */ };
 
 /***/ }),
-/* 51 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // false -> Array#indexOf
 // true  -> Array#includes
-var toIObject = __webpack_require__(15)
-  , toLength  = __webpack_require__(67)
-  , toIndex   = __webpack_require__(66);
+var toIObject = __webpack_require__(24)
+  , toLength  = __webpack_require__(98)
+  , toIndex   = __webpack_require__(97);
 module.exports = function(IS_INCLUDES){
   return function($this, el, fromIndex){
     var O      = toIObject($this)
@@ -13310,39 +14627,11 @@ module.exports = function(IS_INCLUDES){
 };
 
 /***/ }),
-/* 52 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// getting tag from 19.1.3.6 Object.prototype.toString()
-var cof = __webpack_require__(19)
-  , TAG = __webpack_require__(1)('toStringTag')
-  // ES3 wrong here
-  , ARG = cof(function(){ return arguments; }()) == 'Arguments';
-
-// fallback for IE11 Script Access Denied error
-var tryGet = function(it, key){
-  try {
-    return it[key];
-  } catch(e){ /* empty */ }
-};
-
-module.exports = function(it){
-  var O, T, B;
-  return it === undefined ? 'Undefined' : it === null ? 'Null'
-    // @@toStringTag case
-    : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
-    // builtinTag case
-    : ARG ? cof(O)
-    // ES3 arguments fallback
-    : (B = cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-};
-
-/***/ }),
-/* 53 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // optional / simple context binding
-var aFunction = __webpack_require__(49);
+var aFunction = __webpack_require__(79);
 module.exports = function(fn, that, length){
   aFunction(fn);
   if(that === undefined)return fn;
@@ -13363,42 +14652,32 @@ module.exports = function(fn, that, length){
 };
 
 /***/ }),
-/* 54 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(0).document && document.documentElement;
+module.exports = __webpack_require__(5).document && document.documentElement;
 
 /***/ }),
-/* 55 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = !__webpack_require__(7) && !__webpack_require__(23)(function(){
-  return Object.defineProperty(__webpack_require__(20)('div'), 'a', {get: function(){ return 7; }}).a != 7;
+module.exports = !__webpack_require__(9) && !__webpack_require__(11)(function(){
+  return Object.defineProperty(__webpack_require__(33)('div'), 'a', {get: function(){ return 7; }}).a != 7;
 });
 
 /***/ }),
-/* 56 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// fallback for non-array-like ES3 and non-enumerable old V8 strings
-var cof = __webpack_require__(19);
-module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
-  return cof(it) == 'String' ? it.split('') : Object(it);
-};
-
-/***/ }),
-/* 57 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var create         = __webpack_require__(25)
-  , descriptor     = __webpack_require__(26)
-  , setToStringTag = __webpack_require__(27)
+var create         = __webpack_require__(37)
+  , descriptor     = __webpack_require__(38)
+  , setToStringTag = __webpack_require__(39)
   , IteratorPrototype = {};
 
 // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-__webpack_require__(4)(IteratorPrototype, __webpack_require__(1)('iterator'), function(){ return this; });
+__webpack_require__(6)(IteratorPrototype, __webpack_require__(3)('iterator'), function(){ return this; });
 
 module.exports = function(Constructor, NAME, next){
   Constructor.prototype = create(IteratorPrototype, {next: descriptor(1, next)});
@@ -13406,7 +14685,7 @@ module.exports = function(Constructor, NAME, next){
 };
 
 /***/ }),
-/* 58 */
+/* 86 */
 /***/ (function(module, exports) {
 
 module.exports = function(done, value){
@@ -13414,20 +14693,59 @@ module.exports = function(done, value){
 };
 
 /***/ }),
-/* 59 */
+/* 87 */
 /***/ (function(module, exports) {
 
 module.exports = true;
 
 /***/ }),
-/* 60 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var dP       = __webpack_require__(12)
-  , anObject = __webpack_require__(5)
-  , getKeys  = __webpack_require__(63);
+"use strict";
 
-module.exports = __webpack_require__(7) ? Object.defineProperties : function defineProperties(O, Properties){
+// 19.1.2.1 Object.assign(target, source, ...)
+var getKeys  = __webpack_require__(21)
+  , gOPS     = __webpack_require__(90)
+  , pIE      = __webpack_require__(93)
+  , toObject = __webpack_require__(25)
+  , IObject  = __webpack_require__(35)
+  , $assign  = Object.assign;
+
+// should work with symbols and should have deterministic property order (V8 bug)
+module.exports = !$assign || __webpack_require__(11)(function(){
+  var A = {}
+    , B = {}
+    , S = Symbol()
+    , K = 'abcdefghijklmnopqrst';
+  A[S] = 7;
+  K.split('').forEach(function(k){ B[k] = k; });
+  return $assign({}, A)[S] != 7 || Object.keys($assign({}, B)).join('') != K;
+}) ? function assign(target, source){ // eslint-disable-line no-unused-vars
+  var T     = toObject(target)
+    , aLen  = arguments.length
+    , index = 1
+    , getSymbols = gOPS.f
+    , isEnum     = pIE.f;
+  while(aLen > index){
+    var S      = IObject(arguments[index++])
+      , keys   = getSymbols ? getKeys(S).concat(getSymbols(S)) : getKeys(S)
+      , length = keys.length
+      , j      = 0
+      , key;
+    while(length > j)if(isEnum.call(S, key = keys[j++]))T[key] = S[key];
+  } return T;
+} : $assign;
+
+/***/ }),
+/* 89 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var dP       = __webpack_require__(20)
+  , anObject = __webpack_require__(8)
+  , getKeys  = __webpack_require__(21);
+
+module.exports = __webpack_require__(9) ? Object.defineProperties : function defineProperties(O, Properties){
   anObject(O);
   var keys   = getKeys(Properties)
     , length = keys.length
@@ -13438,13 +14756,19 @@ module.exports = __webpack_require__(7) ? Object.defineProperties : function def
 };
 
 /***/ }),
-/* 61 */
+/* 90 */
+/***/ (function(module, exports) {
+
+exports.f = Object.getOwnPropertySymbols;
+
+/***/ }),
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
-var has         = __webpack_require__(8)
-  , toObject    = __webpack_require__(68)
-  , IE_PROTO    = __webpack_require__(13)('IE_PROTO')
+var has         = __webpack_require__(12)
+  , toObject    = __webpack_require__(25)
+  , IE_PROTO    = __webpack_require__(22)('IE_PROTO')
   , ObjectProto = Object.prototype;
 
 module.exports = Object.getPrototypeOf || function(O){
@@ -13456,13 +14780,13 @@ module.exports = Object.getPrototypeOf || function(O){
 };
 
 /***/ }),
-/* 62 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var has          = __webpack_require__(8)
-  , toIObject    = __webpack_require__(15)
-  , arrayIndexOf = __webpack_require__(51)(false)
-  , IE_PROTO     = __webpack_require__(13)('IE_PROTO');
+var has          = __webpack_require__(12)
+  , toIObject    = __webpack_require__(24)
+  , arrayIndexOf = __webpack_require__(81)(false)
+  , IE_PROTO     = __webpack_require__(22)('IE_PROTO');
 
 module.exports = function(object, names){
   var O      = toIObject(object)
@@ -13478,29 +14802,38 @@ module.exports = function(object, names){
 };
 
 /***/ }),
-/* 63 */
+/* 93 */
+/***/ (function(module, exports) {
+
+exports.f = {}.propertyIsEnumerable;
+
+/***/ }),
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-var $keys       = __webpack_require__(62)
-  , enumBugKeys = __webpack_require__(21);
-
-module.exports = Object.keys || function keys(O){
-  return $keys(O, enumBugKeys);
+// most Object methods by ES6 should accept primitives
+var $export = __webpack_require__(10)
+  , core    = __webpack_require__(0)
+  , fails   = __webpack_require__(11);
+module.exports = function(KEY, exec){
+  var fn  = (core.Object || {})[KEY] || Object[KEY]
+    , exp = {};
+  exp[KEY] = exec(fn);
+  $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
 };
 
 /***/ }),
-/* 64 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(4);
+module.exports = __webpack_require__(6);
 
 /***/ }),
-/* 65 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toInteger = __webpack_require__(14)
-  , defined   = __webpack_require__(10);
+var toInteger = __webpack_require__(23)
+  , defined   = __webpack_require__(18);
 // true  -> String#at
 // false -> String#codePointAt
 module.exports = function(TO_STRING){
@@ -13518,10 +14851,10 @@ module.exports = function(TO_STRING){
 };
 
 /***/ }),
-/* 66 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var toInteger = __webpack_require__(14)
+var toInteger = __webpack_require__(23)
   , max       = Math.max
   , min       = Math.min;
 module.exports = function(index, length){
@@ -13530,32 +14863,22 @@ module.exports = function(index, length){
 };
 
 /***/ }),
-/* 67 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.1.15 ToLength
-var toInteger = __webpack_require__(14)
+var toInteger = __webpack_require__(23)
   , min       = Math.min;
 module.exports = function(it){
   return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
 };
 
 /***/ }),
-/* 68 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 7.1.13 ToObject(argument)
-var defined = __webpack_require__(10);
-module.exports = function(it){
-  return Object(defined(it));
-};
-
-/***/ }),
-/* 69 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.1.1 ToPrimitive(input [, PreferredType])
-var isObject = __webpack_require__(11);
+var isObject = __webpack_require__(19);
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
 // and the second argument - flag - preferred type is a string
 module.exports = function(it, S){
@@ -13568,46 +14891,60 @@ module.exports = function(it, S){
 };
 
 /***/ }),
-/* 70 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var classof   = __webpack_require__(52)
-  , ITERATOR  = __webpack_require__(1)('iterator')
-  , Iterators = __webpack_require__(9);
-module.exports = __webpack_require__(6).getIteratorMethod = function(it){
+var classof   = __webpack_require__(31)
+  , ITERATOR  = __webpack_require__(3)('iterator')
+  , Iterators = __webpack_require__(7);
+module.exports = __webpack_require__(0).getIteratorMethod = function(it){
   if(it != undefined)return it[ITERATOR]
     || it['@@iterator']
     || Iterators[classof(it)];
 };
 
 /***/ }),
-/* 71 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var anObject = __webpack_require__(5)
-  , get      = __webpack_require__(70);
-module.exports = __webpack_require__(6).getIterator = function(it){
+var anObject = __webpack_require__(8)
+  , get      = __webpack_require__(100);
+module.exports = __webpack_require__(0).getIterator = function(it){
   var iterFn = get(it);
   if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
   return anObject(iterFn.call(it));
 };
 
 /***/ }),
-/* 72 */
+/* 102 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var classof   = __webpack_require__(31)
+  , ITERATOR  = __webpack_require__(3)('iterator')
+  , Iterators = __webpack_require__(7);
+module.exports = __webpack_require__(0).isIterable = function(it){
+  var O = Object(it);
+  return O[ITERATOR] !== undefined
+    || '@@iterator' in O
+    || Iterators.hasOwnProperty(classof(O));
+};
+
+/***/ }),
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var addToUnscopables = __webpack_require__(50)
-  , step             = __webpack_require__(58)
-  , Iterators        = __webpack_require__(9)
-  , toIObject        = __webpack_require__(15);
+var addToUnscopables = __webpack_require__(80)
+  , step             = __webpack_require__(86)
+  , Iterators        = __webpack_require__(7)
+  , toIObject        = __webpack_require__(24);
 
 // 22.1.3.4 Array.prototype.entries()
 // 22.1.3.13 Array.prototype.keys()
 // 22.1.3.29 Array.prototype.values()
 // 22.1.3.30 Array.prototype[@@iterator]()
-module.exports = __webpack_require__(24)(Array, 'Array', function(iterated, kind){
+module.exports = __webpack_require__(36)(Array, 'Array', function(iterated, kind){
   this._t = toIObject(iterated); // target
   this._i = 0;                   // next index
   this._k = kind;                // kind
@@ -13633,59 +14970,55 @@ addToUnscopables('values');
 addToUnscopables('entries');
 
 /***/ }),
-/* 73 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var $export = __webpack_require__(22)
-// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-$export($export.S, 'Object', {create: __webpack_require__(25)});
+// 19.1.3.1 Object.assign(target, source)
+var $export = __webpack_require__(10);
+
+$export($export.S + $export.F, 'Object', {assign: __webpack_require__(88)});
 
 /***/ }),
-/* 74 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
+var $export = __webpack_require__(10)
+// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+$export($export.S, 'Object', {create: __webpack_require__(37)});
 
-var $at  = __webpack_require__(65)(true);
+/***/ }),
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
 
-// 21.1.3.27 String.prototype[@@iterator]()
-__webpack_require__(24)(String, 'String', function(iterated){
-  this._t = String(iterated); // target
-  this._i = 0;                // next index
-// 21.1.5.2.1 %StringIteratorPrototype%.next()
-}, function(){
-  var O     = this._t
-    , index = this._i
-    , point;
-  if(index >= O.length)return {value: undefined, done: true};
-  point = $at(O, index);
-  this._i += point.length;
-  return {value: point, done: false};
+// 19.1.2.14 Object.keys(O)
+var toObject = __webpack_require__(25)
+  , $keys    = __webpack_require__(21);
+
+__webpack_require__(94)('keys', function(){
+  return function keys(it){
+    return $keys(toObject(it));
+  };
 });
 
 /***/ }),
-/* 75 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(72);
-var global        = __webpack_require__(0)
-  , hide          = __webpack_require__(4)
-  , Iterators     = __webpack_require__(9)
-  , TO_STRING_TAG = __webpack_require__(1)('toStringTag');
+exports = module.exports = __webpack_require__(44)(true);
+// imports
 
-for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList', 'CSSRuleList'], i = 0; i < 5; i++){
-  var NAME       = collections[i]
-    , Collection = global[NAME]
-    , proto      = Collection && Collection.prototype;
-  if(proto && !proto[TO_STRING_TAG])hide(proto, TO_STRING_TAG, NAME);
-  Iterators[NAME] = Iterators.Array;
-}
+
+// module
+exports.push([module.i, "\n.bgImg {\n    background: url(http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png) no-repeat;\n    width: 21px;\n    height: 24px;\n    position: absolute;\n    left: -30px;\n    top: 0px;\n    z-index: 19;\n    /*background-position: -296px -70px;*/\n}\n", "", {"version":3,"sources":["F:/WorkSpace/leador/sdk/src/trace/components/walk/panelWalk.vue?5909c991"],"names":[],"mappings":";AA+EA;IACA,yFAAA;IACA,YAAA;IACA,aAAA;IACA,mBAAA;IACA,YAAA;IACA,SAAA;IACA,YAAA;IACA,sCAAA;CACA","file":"panelWalk.vue","sourcesContent":["<template>\r\n    <dl id=\"resultDiv\" class=\"plan plan-nobus\" style=\"display: block;\">\r\n        <div class=\"ishow-lib-driving\">\r\n            <walk-Header :distance=\"distance\" :duration=\"duration\"  :names=\"stationsName\" :tactics=\"tactics\"></walk-Header>\r\n            <dl id=\"panel_driving_resultDiv\" class=\"plan plan-nobus\" style=\"display: block;\">\r\n                <dt class=\"start\">\r\n                <div class=\"beforedt\">起</div>\r\n                <div class=\"afterdt\"></div>\r\n                <b>起点</b></dt>\r\n                <template v-for=\"(step, idx) in steps\">\r\n                    <template v-if=\"idx == 0\">\r\n                        <dt id=\"driving-showHighlight\" name=\"driving-showHighlight\" @click=\"moveTo(step)\">\r\n                        <div class=\"beforedt\"></div>\r\n                        <div class=\"afterdt\"></div>\r\n                        <img src=\"http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif\">\r\n                        <b></b>进入<b>{{ step.instruction }}</b>，沿着<b>{{ step.instruction\r\n                        }}</b>行驶{{ getUnit(step.distance) }}</dt>\r\n                    </template>\r\n                    <template v-if=\"idx != 0\">\r\n                        <dt id=\"driving-showHighlight\" name=\"driving-showHighlight\" @click=\"moveTo(step)\" >\r\n                        <div class=\"beforedt\"></div>\r\n                        <div class=\"afterdt\"></div>\r\n                        <img src=\"http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif\"\r\n                             v-bind:style=\"{backgroundPosition: steps[idx-1].turn.backgroundPosition}\"       v-bind:class=\"[steps[idx-1].turn.message == '进入' ?  '' : 'bgImg']\">\r\n                        <b></b>{{ steps[idx-1].turn.message }}<b></b>，沿着<b>{{ step.instruction\r\n                        }}</b>行驶{{ getUnit(step.distance) }}</dt>\r\n                    </template>\r\n                </template>\r\n                <dt class=\"end\">\r\n                <div class=\"beforedt\">终</div>\r\n                <b>终点</b></dt></dl>\r\n        </div>\r\n    </dl>\r\n</template>\r\n\r\n<script>\r\n    import Header  from './panelWalkTitle.vue';\r\n    import bus from '../../event/bus';\r\n    export default {\r\n        props: ['routes'],\r\n        data() {\r\n            return {\r\n                steps: this.routes.steps,\r\n                distance: this.routes.distance,\r\n                duration: this.routes.duration,\r\n                stationsName: [],\r\n                bgImg: \"bgImg\",\r\n                tactics: this.routes.tactics\r\n            };\r\n        },\r\n        components: {\r\n            walkHeader: Header\r\n        },\r\n        mounted() {\r\n            var self = this;\r\n            if(this.steps.length > 1){\r\n                this.steps.forEach((item, idx) => {\r\n                    self.stationsName.push(item.instruction);\r\n                })\r\n            }\r\n//            console.log(this.routes)\r\n            this.steps.forEach((step, idx) => {\r\n                var children = document.querySelectorAll('#driving-showHighlight');\r\n                step.dom = children[idx];\r\n            });\r\n        },\r\n        methods: {\r\n            getUnit(num) {\r\n                return num = 1E3 < num ? (num / 1E3).toFixed(2) + \"公里\" : num + \"米\"\r\n            },\r\n            moveTo(step) {\r\n                //console.log(step);\r\n                bus.$emit('moveTo', step);\r\n            }\r\n        }\r\n    }\r\n</script>\r\n\r\n<style>\r\n    .bgImg {\r\n        background: url(http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png) no-repeat;\r\n        width: 21px;\r\n        height: 24px;\r\n        position: absolute;\r\n        left: -30px;\r\n        top: 0px;\r\n        z-index: 19;\r\n        /*background-position: -296px -70px;*/\r\n    }\r\n</style>"],"sourceRoot":""}]);
+
+// exports
+
 
 /***/ }),
-/* 76 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(77)(true);
+exports = module.exports = __webpack_require__(44)(true);
 // imports
 
 
@@ -13696,89 +15029,7 @@ exports.push([module.i, "\n.bgImg {\n    background: url(http://webapi.ishowchin
 
 
 /***/ }),
-/* 77 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Buffer) {/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function(useSourceMap) {
-	var list = [];
-
-	// return the list of modules as css string
-	list.toString = function toString() {
-		return this.map(function (item) {
-			var content = cssWithMappingToString(item, useSourceMap);
-			if(item[2]) {
-				return "@media " + item[2] + "{" + content + "}";
-			} else {
-				return content;
-			}
-		}).join("");
-	};
-
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
-};
-
-function cssWithMappingToString(item, useSourceMap) {
-	var content = item[1] || '';
-	var cssMapping = item[3];
-	if (!cssMapping) {
-		return content;
-	}
-
-	if (useSourceMap) {
-		var sourceMapping = toComment(cssMapping);
-		var sourceURLs = cssMapping.sources.map(function (source) {
-			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
-		});
-
-		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-	}
-
-	return [content].join('\n');
-}
-
-// Adapted from convert-source-map (MIT)
-function toComment(sourceMap) {
-  var base64 = new Buffer(JSON.stringify(sourceMap)).toString('base64');
-  var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-
-  return '/*# ' + data + ' */';
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(45).Buffer))
-
-/***/ }),
-/* 78 */
+/* 109 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -13868,7 +15119,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 79 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -30957,17 +32208,17 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17), __webpack_require__(95)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(26), __webpack_require__(132)(module)))
 
 /***/ }),
-/* 80 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(33),
+  __webpack_require__(50),
   /* template */
-  __webpack_require__(86),
+  __webpack_require__(122),
   /* scopeId */
   null,
   /* cssModules */
@@ -30994,14 +32245,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 81 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(34),
+  __webpack_require__(51),
   /* template */
-  __webpack_require__(90),
+  __webpack_require__(127),
   /* scopeId */
   null,
   /* cssModules */
@@ -31028,14 +32279,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 82 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(35),
+  __webpack_require__(52),
   /* template */
-  __webpack_require__(88),
+  __webpack_require__(125),
   /* scopeId */
   null,
   /* cssModules */
@@ -31062,14 +32313,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 83 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(36),
+  __webpack_require__(53),
   /* template */
-  __webpack_require__(91),
+  __webpack_require__(128),
   /* scopeId */
   null,
   /* cssModules */
@@ -31096,18 +32347,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 84 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(92)
+__webpack_require__(130)
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(37),
+  __webpack_require__(54),
   /* template */
-  __webpack_require__(89),
+  __webpack_require__(126),
   /* scopeId */
   null,
   /* cssModules */
@@ -31134,14 +32385,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 85 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(38),
+  __webpack_require__(55),
   /* template */
-  __webpack_require__(87),
+  __webpack_require__(124),
   /* scopeId */
   null,
   /* cssModules */
@@ -31168,1130 +32419,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 86 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "bus_panel contro_panel contro_panel_position_lr contro_panel_height",
-    staticStyle: {
-      "width": "316px",
-      "background-color": "#fff"
-    }
-  }, [_c('div', {
-    staticClass: "chose_four "
-  }, [_c('ul', {
-    staticClass: "chose_four_li"
-  }, [(_vm.status == 0) ? [_vm._l((_vm.result.routes), function(route, index) {
-    return [_c('bus-Scheme', {
-      attrs: {
-        "route": route,
-        "routes": _vm.routes,
-        "index": index
-      }
-    }), _vm._v(" "), _c('lin-Left', {
-      attrs: {
-        "route": route,
-        "index": index
-      }
-    })]
-  })] : _vm._e()], 2)])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-24fbdf90", module.exports)
-  }
-}
-
-/***/ }),
-/* 87 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "planTitle",
-    attrs: {
-      "id": "panel_driving_title"
-    }
-  }, [_c('h3', {
-    attrs: {
-      "title": ""
-    }
-  }, [_c('b', [_vm._v(_vm._s(_vm.getTitlle(_vm.names)))])]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.getMin(_vm.duration)) + " | " + _vm._s(_vm.getUnit(_vm.dist)) + " | "), _c('span', [_vm._v(_vm._s(_vm.tac))])])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-6f253582", module.exports)
-  }
-}
-
-/***/ }),
-/* 88 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('li', {
-    staticClass: "scheme",
-    attrs: {
-      "isopen": _vm.isopen,
-      "data-index": _vm.index
-    },
-    on: {
-      "click": _vm.toggle
-    }
-  }, [_c('font', [_vm._v(_vm._s(_vm.index + 1))]), _vm._v(" "), _c('form', {
-    staticClass: "bus_line"
-  }, [_c('p', {
-    staticClass: "bus_line_left"
-  }, [_c('font', {
-    staticClass: "address"
-  }, [_vm._v(_vm._s(_vm._f("getBusline")(_vm.buslines)))]), _vm._v(" "), _c('font', {
-    staticClass: "detailed_information"
-  }, [_vm._v(_vm._s(_vm.detailed))])], 1), _vm._v(" "), _vm._m(0)])], 1)
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('span', {
-    staticClass: "open"
-  }, [_c('img', {
-    staticClass: "open_x",
-    staticStyle: {
-      "background": "rgba(0, 0, 0, 0) url(http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png)",
-      "background-position": "-266px -44px"
-    },
-    attrs: {
-      "src": "http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif"
-    }
-  })])
-}]}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-7d4b6c45", module.exports)
-  }
-}
-
-/***/ }),
-/* 89 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('dl', {
-    staticClass: "plan plan-nobus",
-    staticStyle: {
-      "display": "block"
-    },
-    attrs: {
-      "id": "resultDiv"
-    }
-  }, [_c('div', {
-    staticClass: "ishow-lib-driving"
-  }, [_c('car-Header', {
-    attrs: {
-      "distance": _vm.distance,
-      "duration": _vm.duration,
-      "names": _vm.stationsName,
-      "tactics": _vm.tactics
-    }
-  }), _vm._v(" "), _c('dl', {
-    staticClass: "plan plan-nobus",
-    staticStyle: {
-      "display": "block"
-    },
-    attrs: {
-      "id": "panel_driving_resultDiv"
-    }
-  }, [_vm._m(0), _vm._v(" "), _vm._l((_vm.steps), function(step, idx) {
-    return [(idx == 0) ? [_c('dt', {
-      attrs: {
-        "id": "driving-showHighlight",
-        "name": "driving-showHighlight"
-      },
-      on: {
-        "click": function($event) {
-          _vm.moveTo(step)
-        }
-      }
-    }, [_c('div', {
-      staticClass: "beforedt"
-    }), _vm._v(" "), _c('div', {
-      staticClass: "afterdt"
-    }), _vm._v(" "), _c('img', {
-      attrs: {
-        "src": "http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif"
-      }
-    }), _vm._v(" "), _c('b'), _vm._v("进入"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("，沿着"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("行驶" + _vm._s(_vm.getUnit(step.distance)))])] : _vm._e(), _vm._v(" "), (idx != 0) ? [_c('dt', {
-      attrs: {
-        "id": "driving-showHighlight",
-        "name": "driving-showHighlight"
-      },
-      on: {
-        "click": function($event) {
-          _vm.moveTo(step)
-        }
-      }
-    }, [_c('div', {
-      staticClass: "beforedt"
-    }), _vm._v(" "), _c('div', {
-      staticClass: "afterdt"
-    }), _vm._v(" "), _c('img', {
-      class: [_vm.steps[idx - 1].turn.message == '进入' ? '' : 'bgImg'],
-      style: ({
-        backgroundPosition: _vm.steps[idx - 1].turn.backgroundPosition
-      }),
-      attrs: {
-        "src": "http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif"
-      }
-    }), _vm._v(" "), _c('b'), _vm._v(_vm._s(_vm.steps[idx - 1].turn.message)), _c('b'), _vm._v("，沿着"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("行驶" + _vm._s(_vm.getUnit(step.distance)))])] : _vm._e()]
-  }), _vm._v(" "), _vm._m(1)], 2)], 1)])
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('dt', {
-    staticClass: "start"
-  }, [_c('div', {
-    staticClass: "beforedt"
-  }, [_vm._v("起")]), _vm._v(" "), _c('div', {
-    staticClass: "afterdt"
-  }), _vm._v(" "), _c('b', [_vm._v("起点")])])
-},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('dt', {
-    staticClass: "end"
-  }, [_c('div', {
-    staticClass: "beforedt"
-  }, [_vm._v("终")]), _vm._v(" "), _c('b', [_vm._v("终点")])])
-}]}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-98756508", module.exports)
-  }
-}
-
-/***/ }),
-/* 90 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('li', {
-    staticClass: "lin_left_x",
-    style: ({
-      display: _vm.activeBlock
-    })
-  }, [_c('span', {
-    staticClass: "begin"
-  }, [_vm._v("起")]), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._l((_vm.scheme.steps), function(item, index) {
-    return [(item.type == 5) ? [_c('ul', {
-      staticClass: "line_long",
-      attrs: {
-        "data-step-index": "0"
-      }
-    }, [_c('li', {
-      staticClass: "line_long03"
-    }, [_c('p', {
-      staticClass: "round",
-      staticStyle: {
-        "background": "url(http://webapi.ishowchina.com/jsmap/3.4.3/images/round_03.png)0 0 no-repeat"
-      }
-    }), _vm._v(" "), _c('p', [_c('span', [_vm._v("步行至 "), _c('b', {
-      staticClass: "path_end"
-    }, [_vm._v(_vm._s((null == _vm.scheme.steps[index + 1] ? "目的地" : _vm.scheme.steps[index + 1].vehicle.start_name)))])]), _c('font', [_vm._v(_vm._s(_vm.getUnit(item.distance)))])], 1)])])] : _vm._e(), _vm._v(" "), (item.type != 5) ? [_c('ul', {
-      staticClass: "line_long_shi",
-      attrs: {
-        "data-step-index": "1"
-      }
-    }, [_c('li', {
-      staticClass: "line_long02"
-    }, [_c('p', {
-      staticClass: "round",
-      staticStyle: {
-        "background": "url(http://webapi.ishowchina.com/jsmap/3.4.3/images/round_03.png)0 0 no-repeat"
-      }
-    }), _vm._v(" "), _c('p', [_c('span', {
-      staticClass: "path_line"
-    }, [_vm._v(_vm._s(item.vehicle.name))]), _c('br'), _c('b', {
-      staticClass: "path_start"
-    }, [_vm._v(_vm._s(item.vehicle.start_name))]), _vm._v(" 上车"), _c('br'), _c('b', {
-      staticClass: "path_end"
-    }, [_vm._v(_vm._s(item.vehicle.end_name))]), _vm._v("\n                        下车"), _c('font', [_vm._v(_vm._s((parseInt(item.vehicle.stop_num) + 1) + "站"))])], 1)])])] : _vm._e()]
-  }), _vm._v(" "), _c('span', {
-    staticClass: "end"
-  }, [_vm._v("终")]), _vm._v(" "), _c('div', {
-    staticClass: "end_x"
-  }, [_vm._v("终点")])], 2)
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "qi_x"
-  }, [_c('p', [_c('b', [_vm._v("起点")])])])
-}]}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-f3186170", module.exports)
-  }
-}
-
-/***/ }),
-/* 91 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "ishow-lib-driving"
-  }, [_c('div', {
-    staticClass: "planTitle",
-    attrs: {
-      "id": "title",
-      "index": "0"
-    }
-  }), _vm._v(" "), _c('panel-Car', {
-    attrs: {
-      "routes": _vm.routes
-    }
-  })], 1)
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-f461c7d0", module.exports)
-  }
-}
-
-/***/ }),
-/* 92 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(76);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(93)("0d6ce3b9", content, false);
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js?sourceMap!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-98756508\",\"scoped\":false,\"hasInlineConfig\":false}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./panelCar.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js?sourceMap!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-98756508\",\"scoped\":false,\"hasInlineConfig\":false}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./panelCar.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 93 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-  MIT License http://www.opensource.org/licenses/mit-license.php
-  Author Tobias Koppers @sokra
-  Modified by Evan You @yyx990803
-*/
-
-var hasDocument = typeof document !== 'undefined'
-
-if (typeof DEBUG !== 'undefined' && DEBUG) {
-  if (!hasDocument) {
-    throw new Error(
-    'vue-style-loader cannot be used in a non-browser environment. ' +
-    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
-  ) }
-}
-
-var listToStyles = __webpack_require__(94)
-
-/*
-type StyleObject = {
-  id: number;
-  parts: Array<StyleObjectPart>
-}
-
-type StyleObjectPart = {
-  css: string;
-  media: string;
-  sourceMap: ?string
-}
-*/
-
-var stylesInDom = {/*
-  [id: number]: {
-    id: number,
-    refs: number,
-    parts: Array<(obj?: StyleObjectPart) => void>
-  }
-*/}
-
-var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
-var singletonElement = null
-var singletonCounter = 0
-var isProduction = false
-var noop = function () {}
-
-// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-// tags it will allow on a page
-var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
-
-module.exports = function (parentId, list, _isProduction) {
-  isProduction = _isProduction
-
-  var styles = listToStyles(parentId, list)
-  addStylesToDom(styles)
-
-  return function update (newList) {
-    var mayRemove = []
-    for (var i = 0; i < styles.length; i++) {
-      var item = styles[i]
-      var domStyle = stylesInDom[item.id]
-      domStyle.refs--
-      mayRemove.push(domStyle)
-    }
-    if (newList) {
-      styles = listToStyles(parentId, newList)
-      addStylesToDom(styles)
-    } else {
-      styles = []
-    }
-    for (var i = 0; i < mayRemove.length; i++) {
-      var domStyle = mayRemove[i]
-      if (domStyle.refs === 0) {
-        for (var j = 0; j < domStyle.parts.length; j++) {
-          domStyle.parts[j]()
-        }
-        delete stylesInDom[domStyle.id]
-      }
-    }
-  }
-}
-
-function addStylesToDom (styles /* Array<StyleObject> */) {
-  for (var i = 0; i < styles.length; i++) {
-    var item = styles[i]
-    var domStyle = stylesInDom[item.id]
-    if (domStyle) {
-      domStyle.refs++
-      for (var j = 0; j < domStyle.parts.length; j++) {
-        domStyle.parts[j](item.parts[j])
-      }
-      for (; j < item.parts.length; j++) {
-        domStyle.parts.push(addStyle(item.parts[j]))
-      }
-      if (domStyle.parts.length > item.parts.length) {
-        domStyle.parts.length = item.parts.length
-      }
-    } else {
-      var parts = []
-      for (var j = 0; j < item.parts.length; j++) {
-        parts.push(addStyle(item.parts[j]))
-      }
-      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
-    }
-  }
-}
-
-function createStyleElement () {
-  var styleElement = document.createElement('style')
-  styleElement.type = 'text/css'
-  head.appendChild(styleElement)
-  return styleElement
-}
-
-function addStyle (obj /* StyleObjectPart */) {
-  var update, remove
-  var styleElement = document.querySelector('style[data-vue-ssr-id~="' + obj.id + '"]')
-
-  if (styleElement) {
-    if (isProduction) {
-      // has SSR styles and in production mode.
-      // simply do nothing.
-      return noop
-    } else {
-      // has SSR styles but in dev mode.
-      // for some reason Chrome can't handle source map in server-rendered
-      // style tags - source maps in <style> only works if the style tag is
-      // created and inserted dynamically. So we remove the server rendered
-      // styles and inject new ones.
-      styleElement.parentNode.removeChild(styleElement)
-    }
-  }
-
-  if (isOldIE) {
-    // use singleton mode for IE9.
-    var styleIndex = singletonCounter++
-    styleElement = singletonElement || (singletonElement = createStyleElement())
-    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
-    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
-  } else {
-    // use multi-style-tag mode in all other cases
-    styleElement = createStyleElement()
-    update = applyToTag.bind(null, styleElement)
-    remove = function () {
-      styleElement.parentNode.removeChild(styleElement)
-    }
-  }
-
-  update(obj)
-
-  return function updateStyle (newObj /* StyleObjectPart */) {
-    if (newObj) {
-      if (newObj.css === obj.css &&
-          newObj.media === obj.media &&
-          newObj.sourceMap === obj.sourceMap) {
-        return
-      }
-      update(obj = newObj)
-    } else {
-      remove()
-    }
-  }
-}
-
-var replaceText = (function () {
-  var textStore = []
-
-  return function (index, replacement) {
-    textStore[index] = replacement
-    return textStore.filter(Boolean).join('\n')
-  }
-})()
-
-function applyToSingletonTag (styleElement, index, remove, obj) {
-  var css = remove ? '' : obj.css
-
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = replaceText(index, css)
-  } else {
-    var cssNode = document.createTextNode(css)
-    var childNodes = styleElement.childNodes
-    if (childNodes[index]) styleElement.removeChild(childNodes[index])
-    if (childNodes.length) {
-      styleElement.insertBefore(cssNode, childNodes[index])
-    } else {
-      styleElement.appendChild(cssNode)
-    }
-  }
-}
-
-function applyToTag (styleElement, obj) {
-  var css = obj.css
-  var media = obj.media
-  var sourceMap = obj.sourceMap
-
-  if (media) {
-    styleElement.setAttribute('media', media)
-  }
-
-  if (sourceMap) {
-    // https://developer.chrome.com/devtools/docs/javascript-debugging
-    // this makes source maps inside style tags work properly in Chrome
-    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
-    // http://stackoverflow.com/a/26603875
-    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
-  }
-
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = css
-  } else {
-    while (styleElement.firstChild) {
-      styleElement.removeChild(styleElement.firstChild)
-    }
-    styleElement.appendChild(document.createTextNode(css))
-  }
-}
-
-
-/***/ }),
-/* 94 */
-/***/ (function(module, exports) {
-
-/**
- * Translates the list format produced by css-loader into something
- * easier to manipulate.
- */
-module.exports = function listToStyles (parentId, list) {
-  var styles = []
-  var newStyles = {}
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i]
-    var id = item[0]
-    var css = item[1]
-    var media = item[2]
-    var sourceMap = item[3]
-    var part = {
-      id: parentId + ':' + i,
-      css: css,
-      media: media,
-      sourceMap: sourceMap
-    }
-    if (!newStyles[id]) {
-      styles.push(newStyles[id] = { id: id, parts: [part] })
-    } else {
-      newStyles[id].parts.push(part)
-    }
-  }
-  return styles
-}
-
-
-/***/ }),
-/* 95 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 96 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-
-var _getIterator2 = __webpack_require__(18);
-
-var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-var _create = __webpack_require__(43);
-
-var _create2 = _interopRequireDefault(_create);
-
-var _bus = __webpack_require__(3);
-
-var _bus2 = _interopRequireDefault(_bus);
-
-var _vue = __webpack_require__(16);
-
-var _vue2 = _interopRequireDefault(_vue);
-
-var _walk = __webpack_require__(99);
-
-var _walk2 = _interopRequireDefault(_walk);
-
-var _restConfig = __webpack_require__(40);
-
-var _restConfig2 = _interopRequireDefault(_restConfig);
-
-var _BaseRoute = __webpack_require__(39);
-
-var _BaseRoute2 = _interopRequireDefault(_BaseRoute);
-
-var _WalklineParse = __webpack_require__(98);
-
-var _WalklineParse2 = _interopRequireDefault(_WalklineParse);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Created by wake on 2017/4/7/007.
- */
-
-Walkline.prototype = (0, _create2.default)(_BaseRoute2.default.prototype);
-
-function Walkline(options) {
-    _BaseRoute2.default.call(this, options);
-    this._transferUrl = _restConfig2.default.routeWalkUrl + _restConfig2.default.ak;
-    this.walkLayer = new ol.layer.Vector({
-        source: new ol.source.Vector(),
-        style: new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: '#0066FF',
-                width: 5
-            })
-        })
-    });
-    this._map.addLayer(this.walkLayer);
-    this._setSelect();
-}
-
-Walkline.prototype._initPanel = function () {
-    var self = this;
-    var el = this._panel;
-    var route = _WalklineParse2.default.parse(this._responseData);
-    "string" == typeof this._panel && (this._panel = document.getElementById(this._panel));
-    this._panel.innerHTML = "<app-Walk v-bind:data-msg='dataMsg' ></app-Walk>";
-    this._app = new _vue2.default({
-        el: '#' + el,
-        data: {
-            dataMsg: route
-        },
-        components: {
-            appWalk: _walk2.default
-        }
-    });
-    _bus2.default.$on('moveTo', this._moveTo.bind(self));
-    this._draw(route);
-};
-
-Walkline.prototype._draw = function (route) {
-    if (route) {
-        this.clearLayer();
-        this._redraw(route);
-    }
-};
-
-Walkline.prototype._redraw = function (route) {
-    var aStyles = this._getPasspoiStyle(route);
-    this._drawIcon(aStyles);
-    var walkFeatures = [];
-    for (var _iterator = route.steps, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : (0, _getIterator3.default)(_iterator);;) {
-        var _ref;
-
-        if (_isArray) {
-            if (_i >= _iterator.length) break;
-            _ref = _iterator[_i++];
-        } else {
-            _i = _iterator.next();
-            if (_i.done) break;
-            _ref = _i.value;
-        }
-
-        var step = _ref;
-
-        var geometry = new ol.geom.LineString(step.path);
-        var walkFeature = new ol.Feature({
-            geometry: geometry
-        });
-        step.geometry = geometry;
-        walkFeature.setProperties({ step: step });
-        walkFeatures.push(walkFeature);
-    }
-    this.walkLayer.getSource().addFeatures(walkFeatures);
-};
-
-Walkline.prototype._setSelect = function () {
-    var self = this;
-    var selectWalk = new ol.interaction.Select({
-        condition: ol.events.condition.click,
-        style: new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: "#0ae6fb",
-                lineDash: [8],
-                width: 5
-            })
-        }),
-        filter: function filter(feature, layer) {
-            return layer == self.walkLayer;
-        }
-    });
-    this._addInteraction([selectWalk]);
-};
-
-Walkline.prototype.clearLayer = function () {
-    this.walkLayer.getSource().clear();
-    this.iconLayer.getSource().clear();
-};
-
-Walkline.prototype._getPasspoiStyle = function (route) {
-    var passStyles = [];
-    passStyles.push({
-        point: route.start,
-        image: new ol.style.Icon({
-            src: 'http://webapi.ishowchina.com/jsmap/3.4.3/images/point_1.png', // //../../assets/img/start.png
-            anchor: [0.5, 1],
-            // imgSize: [24, 38], // 203 380
-            size: [35, 30],
-            offset: [367, 0]
-        })
-    });
-    passStyles.push({
-        point: route.end,
-        image: new ol.style.Icon({
-            src: 'http://webapi.ishowchina.com/jsmap/3.4.3/images/point_1.png', // //../../assets/img/start.png
-            anchor: [0.5, 1],
-            size: [35, 30],
-            offset: [401, 0]
-        })
-    });
-    return passStyles;
-};
-
-Walkline.prototype._moveTo = function (step) {
-    var geometry = step.geometry;
-    this._fly2Geometry(geometry);
-};
-
-exports.default = Walkline;
-
-/***/ }),
-/* 97 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-
-var _panelWalk = __webpack_require__(104);
-
-var _panelWalk2 = _interopRequireDefault(_panelWalk);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = {
-    props: ["dataMsg"],
-    data: function data() {
-        return {
-            routes: this.dataMsg
-        };
-    },
-    mounted: function mounted() {},
-
-    components: {
-        panelWalk: _panelWalk2.default
-    }
-}; //
-//
-//
-//
-//
-//
-//
-
-/***/ }),
-/* 98 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-
-var _getIterator2 = __webpack_require__(18);
-
-var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/**
- * Created by Administrator on 2017/4/14/014.
- */
-
-exports.default = {
-    parse: function parse(data) {
-        var self = this;
-        var route = {
-            start: [data.result.origin.originPt.lng, data.result.origin.originPt.lat],
-            end: [data.result.destination.destinationPt.lng, data.result.destination.destinationPt.lat],
-            steps: [],
-            tactics: self.tactics[data.result.routes[0].tactics],
-            distance: data.result.routes[0].distance,
-            duration: data.result.routes[0].duration
-        };
-        var steps = data.result.routes[0].steps;
-        for (var _iterator = steps.entries(), _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : (0, _getIterator3.default)(_iterator);;) {
-            var _ref;
-
-            if (_isArray) {
-                if (_i >= _iterator.length) break;
-                _ref = _iterator[_i++];
-            } else {
-                _i = _iterator.next();
-                if (_i.done) break;
-                _ref = _i.value;
-            }
-
-            var _ref2 = _ref,
-                idx = _ref2[0],
-                item = _ref2[1];
-
-            if (item.path == "") continue;
-            route.steps[idx] = {
-                distance: item.distance,
-                instruction: item.instruction,
-                path: item.path.split(';').map(function (item) {
-                    return item.split(',');
-                }), // Array.<ol.coordinate>
-                turn: self.turn[item.turn]
-            };
-        }
-        return route;
-    },
-
-    tactics: {
-        11: "最少时间",
-        12: "最短路径"
-    },
-
-    turn: {
-        0: { message: '进入' },
-        1: { message: "直行", backgroundPosition: '-317px -75px' },
-        2: { message: '右前方转弯', backgroundPosition: '-302px -340px' },
-        3: { message: '右转', backgroundPosition: '-291px -102px' },
-        4: { message: '右后方转弯', backgroundPosition: '-291px -376px' },
-        5: { message: '掉头', backgroundPosition: '-268px -340px' },
-        6: { message: '左后方转弯', backgroundPosition: '-291px -400px' },
-        7: { message: '左转', backgroundPosition: '-293px -73px' },
-        8: { message: '左前方转弯', backgroundPosition: '-285px -340px' },
-        9: { message: '左侧', backgroundPosition: '' },
-        10: { message: '右侧', backgroundPosition: '-302px -340px' },
-        11: { message: '分歧-左', backgroundPosition: '' },
-        12: { message: '分歧中央', backgroundPosition: '' },
-        13: { message: '分歧右', backgroundPosition: '' },
-        14: { message: '环岛', backgroundPosition: '' },
-        15: { message: '进渡口', backgroundPosition: '' },
-        16: { message: '出渡口', backgroundPosition: '' }
-    }
-};
-
-/***/ }),
-/* 99 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Component = __webpack_require__(2)(
-  /* script */
-  __webpack_require__(97),
-  /* template */
-  __webpack_require__(100),
-  /* scopeId */
-  null,
-  /* cssModules */
-  null
-)
-Component.options.__file = "F:\\WorkSpace\\leador\\sdk\\src\\trace\\components\\walk\\walk.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] walk.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-1b4ff2a4", Component.options)
-  } else {
-    hotAPI.reload("data-v-1b4ff2a4", Component.options)
-  }
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 100 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: "ishow-lib-driving"
-  }, [_c('div', {
-    staticClass: "planTitle",
-    attrs: {
-      "id": "title",
-      "index": "0"
-    }
-  }), _vm._v(" "), _c('panel-Walk', {
-    attrs: {
-      "routes": _vm.routes
-    }
-  })], 1)
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-1b4ff2a4", module.exports)
-  }
-}
-
-/***/ }),
-/* 101 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-
-var _panelWalkTitle = __webpack_require__(105);
-
-var _panelWalkTitle2 = _interopRequireDefault(_panelWalkTitle);
-
-var _bus = __webpack_require__(3);
-
-var _bus2 = _interopRequireDefault(_bus);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-exports.default = {
-    props: ['routes'],
-    data: function data() {
-        return {
-            steps: this.routes.steps,
-            distance: this.routes.distance,
-            duration: this.routes.duration,
-            stationsName: [],
-            bgImg: "bgImg",
-            tactics: this.routes.tactics
-        };
-    },
-
-    components: {
-        walkHeader: _panelWalkTitle2.default
-    },
-    mounted: function mounted() {
-        var self = this;
-        if (this.steps.length > 1) {
-            this.steps.forEach(function (item, idx) {
-                self.stationsName.push(item.instruction);
-            });
-        }
-        //            console.log(this.routes)
-        this.steps.forEach(function (step, idx) {
-            var children = document.querySelectorAll('#driving-showHighlight');
-            step.dom = children[idx];
-        });
-    },
-
-    methods: {
-        getUnit: function getUnit(num) {
-            return num = 1E3 < num ? (num / 1E3).toFixed(2) + "公里" : num + "米";
-        },
-        moveTo: function moveTo(step) {
-            //console.log(step);
-            _bus2.default.$emit('moveTo', step);
-        }
-    }
-};
-
-/***/ }),
-/* 102 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.__esModule = true;
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-exports.default = {
-    props: ["distance", "duration", "names", "tactics"],
-    data: function data() {
-        return {
-            dist: this.distance,
-            tac: this.tactics
-        };
-    },
-
-    methods: {
-        getUnit: function getUnit(num) {
-            return num = 1E3 < num ? (num / 1E3).toFixed(2) + "公里" : num + "米";
-        },
-        getMin: function getMin(num) {
-            return num = 3600 < num ? Math.floor(num / 3600) + "小时" + num % 3600 / 60 + "分钟" : num / 60 + "分钟";
-        },
-        getTitlle: function getTitlle(names) {
-            if (names.length > 4) {
-                return names.slice(0, 2).join('>') + '......' + names.slice(names.length - 2).join('>');
-            } else {
-                return names.join('>');
-            }
-        }
-    }
-};
-
-/***/ }),
-/* 103 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(77)(true);
-// imports
-
-
-// module
-exports.push([module.i, "\n.bgImg {\n    background: url(http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png) no-repeat;\n    width: 21px;\n    height: 24px;\n    position: absolute;\n    left: -30px;\n    top: 0px;\n    z-index: 19;\n    /*background-position: -296px -70px;*/\n}\n", "", {"version":3,"sources":["F:/WorkSpace/leador/sdk/src/trace/components/walk/panelWalk.vue?5909c991"],"names":[],"mappings":";AA+EA;IACA,yFAAA;IACA,YAAA;IACA,aAAA;IACA,mBAAA;IACA,YAAA;IACA,SAAA;IACA,YAAA;IACA,sCAAA;CACA","file":"panelWalk.vue","sourcesContent":["<template>\r\n    <dl id=\"resultDiv\" class=\"plan plan-nobus\" style=\"display: block;\">\r\n        <div class=\"ishow-lib-driving\">\r\n            <walk-Header :distance=\"distance\" :duration=\"duration\"  :names=\"stationsName\" :tactics=\"tactics\"></walk-Header>\r\n            <dl id=\"panel_driving_resultDiv\" class=\"plan plan-nobus\" style=\"display: block;\">\r\n                <dt class=\"start\">\r\n                <div class=\"beforedt\">起</div>\r\n                <div class=\"afterdt\"></div>\r\n                <b>起点</b></dt>\r\n                <template v-for=\"(step, idx) in steps\">\r\n                    <template v-if=\"idx == 0\">\r\n                        <dt id=\"driving-showHighlight\" name=\"driving-showHighlight\" @click=\"moveTo(step)\">\r\n                        <div class=\"beforedt\"></div>\r\n                        <div class=\"afterdt\"></div>\r\n                        <img src=\"http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif\">\r\n                        <b></b>进入<b>{{ step.instruction }}</b>，沿着<b>{{ step.instruction\r\n                        }}</b>行驶{{ getUnit(step.distance) }}</dt>\r\n                    </template>\r\n                    <template v-if=\"idx != 0\">\r\n                        <dt id=\"driving-showHighlight\" name=\"driving-showHighlight\" @click=\"moveTo(step)\" >\r\n                        <div class=\"beforedt\"></div>\r\n                        <div class=\"afterdt\"></div>\r\n                        <img src=\"http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif\"\r\n                             v-bind:style=\"{backgroundPosition: steps[idx-1].turn.backgroundPosition}\"       v-bind:class=\"[steps[idx-1].turn.message == '进入' ?  '' : 'bgImg']\">\r\n                        <b></b>{{ steps[idx-1].turn.message }}<b></b>，沿着<b>{{ step.instruction\r\n                        }}</b>行驶{{ getUnit(step.distance) }}</dt>\r\n                    </template>\r\n                </template>\r\n                <dt class=\"end\">\r\n                <div class=\"beforedt\">终</div>\r\n                <b>终点</b></dt></dl>\r\n        </div>\r\n    </dl>\r\n</template>\r\n\r\n<script>\r\n    import Header  from './panelWalkTitle.vue';\r\n    import bus from '../../event/bus';\r\n    export default {\r\n        props: ['routes'],\r\n        data() {\r\n            return {\r\n                steps: this.routes.steps,\r\n                distance: this.routes.distance,\r\n                duration: this.routes.duration,\r\n                stationsName: [],\r\n                bgImg: \"bgImg\",\r\n                tactics: this.routes.tactics\r\n            };\r\n        },\r\n        components: {\r\n            walkHeader: Header\r\n        },\r\n        mounted() {\r\n            var self = this;\r\n            if(this.steps.length > 1){\r\n                this.steps.forEach((item, idx) => {\r\n                    self.stationsName.push(item.instruction);\r\n                })\r\n            }\r\n//            console.log(this.routes)\r\n            this.steps.forEach((step, idx) => {\r\n                var children = document.querySelectorAll('#driving-showHighlight');\r\n                step.dom = children[idx];\r\n            });\r\n        },\r\n        methods: {\r\n            getUnit(num) {\r\n                return num = 1E3 < num ? (num / 1E3).toFixed(2) + \"公里\" : num + \"米\"\r\n            },\r\n            moveTo(step) {\r\n                //console.log(step);\r\n                bus.$emit('moveTo', step);\r\n            }\r\n        }\r\n    }\r\n</script>\r\n\r\n<style>\r\n    .bgImg {\r\n        background: url(http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png) no-repeat;\r\n        width: 21px;\r\n        height: 24px;\r\n        position: absolute;\r\n        left: -30px;\r\n        top: 0px;\r\n        z-index: 19;\r\n        /*background-position: -296px -70px;*/\r\n    }\r\n</style>"],"sourceRoot":""}]);
-
-// exports
-
-
-/***/ }),
-/* 104 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(108)
+__webpack_require__(129)
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(101),
+  __webpack_require__(56),
   /* template */
-  __webpack_require__(107),
+  __webpack_require__(123),
   /* scopeId */
   null,
   /* cssModules */
@@ -32318,14 +32457,14 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 105 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(102),
+  __webpack_require__(57),
   /* template */
-  __webpack_require__(106),
+  __webpack_require__(120),
   /* scopeId */
   null,
   /* cssModules */
@@ -32352,7 +32491,41 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 106 */
+/* 119 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(58),
+  /* template */
+  __webpack_require__(121),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "F:\\WorkSpace\\leador\\sdk\\src\\trace\\components\\walk\\walk.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] walk.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1b4ff2a4", Component.options)
+  } else {
+    hotAPI.reload("data-v-1b4ff2a4", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -32376,7 +32549,72 @@ if (false) {
 }
 
 /***/ }),
-/* 107 */
+/* 121 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "ishow-lib-driving"
+  }, [_c('div', {
+    staticClass: "planTitle",
+    attrs: {
+      "id": "title",
+      "index": "0"
+    }
+  }), _vm._v(" "), _c('panel-Walk', {
+    attrs: {
+      "routes": _vm.routes
+    }
+  })], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1b4ff2a4", module.exports)
+  }
+}
+
+/***/ }),
+/* 122 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "bus_panel contro_panel contro_panel_position_lr contro_panel_height",
+    staticStyle: {
+      "width": "316px",
+      "background-color": "#fff"
+    }
+  }, [_c('div', {
+    staticClass: "chose_four "
+  }, [_c('ul', {
+    staticClass: "chose_four_li"
+  }, [_vm._l((_vm.routes), function(route, index) {
+    return [_c('bus-Scheme', {
+      attrs: {
+        "route": route,
+        "routes": _vm.routes,
+        "index": index
+      }
+    }), _vm._v(" "), _c('lin-Left', {
+      attrs: {
+        "route": route,
+        "index": index
+      }
+    })]
+  })], 2)])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-24fbdf90", module.exports)
+  }
+}
+
+/***/ }),
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -32472,17 +32710,272 @@ if (false) {
 }
 
 /***/ }),
-/* 108 */
+/* 124 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "planTitle",
+    attrs: {
+      "id": "panel_driving_title"
+    }
+  }, [_c('h3', {
+    attrs: {
+      "title": ""
+    }
+  }, [_c('b', [_vm._v(_vm._s(_vm.getTitlle(_vm.names)))])]), _vm._v(" "), _c('p', [_vm._v(_vm._s(_vm.getMin(_vm.duration)) + " | " + _vm._s(_vm.getUnit(_vm.dist)) + " | "), _c('span', [_vm._v(_vm._s(_vm.tac))])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-6f253582", module.exports)
+  }
+}
+
+/***/ }),
+/* 125 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('li', {
+    staticClass: "scheme",
+    attrs: {
+      "isopen": _vm.isopen
+    },
+    on: {
+      "click": _vm.toggle
+    }
+  }, [_c('font', [_vm._v(_vm._s(_vm.index + 1))]), _vm._v(" "), _c('form', {
+    staticClass: "bus_line"
+  }, [_c('p', {
+    staticClass: "bus_line_left"
+  }, [_c('font', {
+    staticClass: "address"
+  }, [_vm._v(_vm._s(_vm._f("getBusline")(_vm.buslines)))]), _vm._v(" "), _c('font', {
+    staticClass: "detailed_information"
+  }, [_vm._v(_vm._s(_vm.detailed))])], 1), _vm._v(" "), _vm._m(0)])], 1)
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('span', {
+    staticClass: "open"
+  }, [_c('img', {
+    staticClass: "open_x",
+    staticStyle: {
+      "background": "rgba(0, 0, 0, 0) url(http://webapi.ishowchina.com/jsmap/3.4.3/images/search_03.png)",
+      "background-position": "-266px -44px"
+    },
+    attrs: {
+      "src": "http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif"
+    }
+  })])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-7d4b6c45", module.exports)
+  }
+}
+
+/***/ }),
+/* 126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('dl', {
+    staticClass: "plan plan-nobus",
+    staticStyle: {
+      "display": "block"
+    },
+    attrs: {
+      "id": "resultDiv"
+    }
+  }, [_c('div', {
+    staticClass: "ishow-lib-driving"
+  }, [_c('car-Header', {
+    attrs: {
+      "distance": _vm.distance,
+      "duration": _vm.duration,
+      "names": _vm.stationsName,
+      "tactics": _vm.tactics
+    }
+  }), _vm._v(" "), _c('dl', {
+    staticClass: "plan plan-nobus",
+    staticStyle: {
+      "display": "block"
+    },
+    attrs: {
+      "id": "panel_driving_resultDiv"
+    }
+  }, [_vm._m(0), _vm._v(" "), _vm._l((_vm.steps), function(step, idx) {
+    return [(idx == 0) ? [_c('dt', {
+      attrs: {
+        "id": "driving-showHighlight",
+        "name": "driving-showHighlight"
+      },
+      on: {
+        "click": function($event) {
+          _vm.moveTo(step)
+        }
+      }
+    }, [_c('div', {
+      staticClass: "beforedt"
+    }), _vm._v(" "), _c('div', {
+      staticClass: "afterdt"
+    }), _vm._v(" "), _c('img', {
+      attrs: {
+        "src": "http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif"
+      }
+    }), _vm._v(" "), _c('b'), _vm._v("进入"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("，沿着"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("行驶" + _vm._s(_vm.getUnit(step.distance)))])] : _vm._e(), _vm._v(" "), (idx != 0) ? [_c('dt', {
+      attrs: {
+        "id": "driving-showHighlight",
+        "name": "driving-showHighlight"
+      },
+      on: {
+        "click": function($event) {
+          _vm.moveTo(step)
+        }
+      }
+    }, [_c('div', {
+      staticClass: "beforedt"
+    }), _vm._v(" "), _c('div', {
+      staticClass: "afterdt"
+    }), _vm._v(" "), _c('img', {
+      class: [_vm.steps[idx - 1].turn.message == '进入' ? '' : 'bgImg'],
+      style: ({
+        backgroundPosition: _vm.steps[idx - 1].turn.backgroundPosition
+      }),
+      attrs: {
+        "src": "http://webapi.ishowchina.com/jsmap/3.4.3/images/img_1.gif"
+      }
+    }), _vm._v(" "), _c('b'), _vm._v(_vm._s(_vm.steps[idx - 1].turn.message)), _c('b'), _vm._v("，沿着"), _c('b', [_vm._v(_vm._s(step.instruction))]), _vm._v("行驶" + _vm._s(_vm.getUnit(step.distance)))])] : _vm._e()]
+  }), _vm._v(" "), _vm._m(1)], 2)], 1)])
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('dt', {
+    staticClass: "start"
+  }, [_c('div', {
+    staticClass: "beforedt"
+  }, [_vm._v("起")]), _vm._v(" "), _c('div', {
+    staticClass: "afterdt"
+  }), _vm._v(" "), _c('b', [_vm._v("起点")])])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('dt', {
+    staticClass: "end"
+  }, [_c('div', {
+    staticClass: "beforedt"
+  }, [_vm._v("终")]), _vm._v(" "), _c('b', [_vm._v("终点")])])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-98756508", module.exports)
+  }
+}
+
+/***/ }),
+/* 127 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('li', {
+    staticClass: "lin_left_x",
+    style: ({
+      display: _vm.activeBlock
+    })
+  }, [_c('span', {
+    staticClass: "begin"
+  }, [_vm._v("起")]), _vm._v(" "), _vm._m(0), _vm._v(" "), _vm._l((_vm.route.steps), function(item, index) {
+    return [(item.type == 5) ? [_c('ul', {
+      staticClass: "line_long",
+      attrs: {
+        "data-step-index": "0"
+      }
+    }, [_c('li', {
+      staticClass: "line_long03"
+    }, [_c('p', {
+      staticClass: "round",
+      staticStyle: {
+        "background": "url(http://webapi.ishowchina.com/jsmap/3.4.3/images/round_03.png)0 0 no-repeat"
+      }
+    }), _vm._v(" "), _c('p', [_c('span', [_vm._v("步行至 "), _c('b', {
+      staticClass: "path_end"
+    }, [_vm._v(_vm._s((null == _vm.route.steps[index + 1] ? "目的地" : _vm.route.steps[index + 1].vehicle.start_name)))])]), _c('font', [_vm._v(_vm._s(_vm.getUnit(item.distance)))])], 1)])])] : _vm._e(), _vm._v(" "), (item.type != 5) ? [_c('ul', {
+      staticClass: "line_long_shi",
+      attrs: {
+        "data-step-index": "1"
+      }
+    }, [_c('li', {
+      staticClass: "line_long02"
+    }, [_c('p', {
+      staticClass: "round",
+      staticStyle: {
+        "background": "url(http://webapi.ishowchina.com/jsmap/3.4.3/images/round_03.png)0 0 no-repeat"
+      }
+    }), _vm._v(" "), _c('p', [_c('span', {
+      staticClass: "path_line"
+    }, [_vm._v(_vm._s(item.vehicle.name))]), _c('br'), _c('b', {
+      staticClass: "path_start"
+    }, [_vm._v(_vm._s(item.vehicle.start_name))]), _vm._v(" 上车"), _c('br'), _c('b', {
+      staticClass: "path_end"
+    }, [_vm._v(_vm._s(item.vehicle.end_name))]), _vm._v("\n                        下车"), _c('font', [_vm._v(_vm._s((parseInt(item.vehicle.stop_num) + 1) + "站"))])], 1)])])] : _vm._e()]
+  }), _vm._v(" "), _c('span', {
+    staticClass: "end"
+  }, [_vm._v("终")]), _vm._v(" "), _c('div', {
+    staticClass: "end_x"
+  }, [_vm._v("终点")])], 2)
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "qi_x"
+  }, [_c('p', [_c('b', [_vm._v("起点")])])])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-f3186170", module.exports)
+  }
+}
+
+/***/ }),
+/* 128 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "ishow-lib-driving"
+  }, [_c('div', {
+    staticClass: "planTitle",
+    attrs: {
+      "id": "title",
+      "index": "0"
+    }
+  }), _vm._v(" "), _c('panel-Car', {
+    attrs: {
+      "routes": _vm.routes
+    }
+  })], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-f461c7d0", module.exports)
+  }
+}
+
+/***/ }),
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(103);
+var content = __webpack_require__(107);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(93)("4604a23c", content, false);
+var update = __webpack_require__(45)("4604a23c", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -32496,6 +32989,235 @@ if(false) {
  // When the module is disposed, remove the <style> tags
  module.hot.dispose(function() { update(); });
 }
+
+/***/ }),
+/* 130 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(108);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(45)("0d6ce3b9", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js?sourceMap!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-98756508\",\"scoped\":false,\"hasInlineConfig\":false}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./panelCar.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js?sourceMap!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-98756508\",\"scoped\":false,\"hasInlineConfig\":false}!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./panelCar.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 131 */
+/***/ (function(module, exports) {
+
+/**
+ * Translates the list format produced by css-loader into something
+ * easier to manipulate.
+ */
+module.exports = function listToStyles (parentId, list) {
+  var styles = []
+  var newStyles = {}
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i]
+    var id = item[0]
+    var css = item[1]
+    var media = item[2]
+    var sourceMap = item[3]
+    var part = {
+      id: parentId + ':' + i,
+      css: css,
+      media: media,
+      sourceMap: sourceMap
+    }
+    if (!newStyles[id]) {
+      styles.push(newStyles[id] = { id: id, parts: [part] })
+    } else {
+      newStyles[id].parts.push(part)
+    }
+  }
+  return styles
+}
+
+
+/***/ }),
+/* 132 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 133 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _dom = __webpack_require__(59);
+
+var _dom2 = _interopRequireDefault(_dom);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+    request: function request(url, cbk) {
+        if (cbk) {
+            var timeStamp = (Math.random() * 100000).toFixed(0);
+            // 全局回调函数
+            window["_cbk" + timeStamp] = function (json) {
+                cbk && cbk(json);
+                try {
+                    delete window["_cbk" + timeStamp];
+                } catch (e) {
+                    window["_cbk" + timeStamp] = null;
+                }
+            };
+            url += "&callback=window._cbk" + timeStamp;
+        }
+
+        var script = this.create('script');
+        script.setAttribute('type', 'text/javascript');
+        script.charset = "utf-8";
+        script.src = url;
+        // 脚本加载完成后进行移除
+        if (script.addEventListener) {
+            script.addEventListener('load', function (e) {
+                var t = e.target;
+                t.parentNode.removeChild(t);
+            }, false);
+        } else if (script.attachEvent) {
+            script.attachEvent('onreadystatechange', function (e) {
+                var t = window.event.srcElement;
+                if (t && (t.readyState == 'loaded' || t.readyState == 'complete')) {
+                    t.parentNode.removeChild(t);
+                }
+            });
+        }
+        document.getElementsByTagName('head')[0].appendChild(script);
+        script = null;
+    },
+
+    create: function create(tag, ns, attrs) {
+        var ele;
+        if (ns) {
+            ele = document.createElementNS(tag, ns);
+        } else {
+            ele = document.createElement(tag);
+        }
+        return _dom2.default.setAttrs(ele, attrs);
+    },
+
+    isString: function isString(s) {
+        return "string" == typeof s || s instanceof String;
+    },
+
+    extend: function extend(to, from) {
+        for (var item in from) {
+            to[item] = from[item];
+        }
+    }
+}; /**
+    * Created by Administrator on 2017/4/14/014.
+    */
+
+/***/ }),
+/* 134 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends2 = __webpack_require__(27);
+
+var _extends3 = _interopRequireDefault(_extends2);
+
+var _lang = __webpack_require__(133);
+
+var _lang2 = _interopRequireDefault(_lang);
+
+var _dom = __webpack_require__(59);
+
+var _dom2 = _interopRequireDefault(_dom);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by wake on 2017/5/9/009.
+ */
+
+exports.default = (0, _extends3.default)({}, _lang2.default, _dom2.default);
+
+/***/ }),
+/* 135 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _Busline = __webpack_require__(47);
+
+var _Busline2 = _interopRequireDefault(_Busline);
+
+var _Walkline = __webpack_require__(49);
+
+var _Walkline2 = _interopRequireDefault(_Walkline);
+
+var _Carline = __webpack_require__(48);
+
+var _Carline2 = _interopRequireDefault(_Carline);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+    Busline: _Busline2.default,
+    Walkline: _Walkline2.default,
+    Carline: _Carline2.default
+}; /**
+    * Created by Administrator on 2017/5/9/009.
+    */
 
 /***/ })
 /******/ ]);

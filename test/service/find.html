@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../../assets/css/ol.css">
+    <script src="../../dist/ol.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<script src="../../dist/ldMap.js"></script>
+<script>
+    var raster = new ol.layer.Tile({
+        source: new ol.source.OSM()
+    });
+
+    var map = new ol.Map({
+        layers: [raster],
+        target: 'map',
+        view: new ol.View({
+            center: [115.18654030522777, 33.48505607105392],
+            zoom: 4,
+            projection: 'EPSG:4326'
+        })
+    });;
+    var params = new L.FindParameters();
+    params.returnGeometry = true;
+    params.layerIds = [0, 1, 2, 3];
+    params.searchText = "蛋糕"; // 关键字
+    params.searchFields = ["ABBRE"]; // 字段
+    var identify = new L.FindTask("http://27.17.60.13:6080/arcgis/rest/services/QUERY/MapServer");
+    identify.execute(params, function (json) {
+        console.log(json);
+    })
+</script>
+</body>
+</html>

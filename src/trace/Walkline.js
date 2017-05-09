@@ -12,6 +12,13 @@ import Parse from './parse/WalklineParse';
 Walkline.prototype = Object.create(BaseRoute.prototype);
 
 
+/**
+ * 步行轨迹构造函数
+ * @param {ol.Map} options.map 地图实例对象
+ * @param {String} options.panel 组件div的id
+ * @param {Object} options 步行组件参数
+ * @constructor
+ */
 function Walkline(options) {
     BaseRoute.call(this, options);
     this._transferUrl = Config.routeWalkUrl + Config.ak;
@@ -28,6 +35,11 @@ function Walkline(options) {
     this._setSelect();
 }
 
+
+/**
+ * 初始化面板
+ * @private
+ */
 Walkline.prototype._initPanel = function () {
     var self = this;
     var el = this._panel;
@@ -48,7 +60,11 @@ Walkline.prototype._initPanel = function () {
 };
 
 
-
+/**
+ * 绘制路径
+ * @param {Object} route  路径数据
+ * @private
+ */
 Walkline.prototype._draw = function (route) {
     if(route){
         this.clearLayer();
@@ -56,6 +72,11 @@ Walkline.prototype._draw = function (route) {
     }
 }
 
+/**
+ * 重绘
+ * @param {Object} route  路径数据
+ * @private
+ */
 Walkline.prototype._redraw = function (route) {
     var aStyles = this._getPasspoiStyle(route);
     this._drawIcon(aStyles);
@@ -73,6 +94,10 @@ Walkline.prototype._redraw = function (route) {
 };
 
 
+/**
+ * 设置要素的交互
+ * @private
+ */
 Walkline.prototype._setSelect = function () {
     var self = this;
     var selectWalk = new ol.interaction.Select({
@@ -91,11 +116,20 @@ Walkline.prototype._setSelect = function () {
     this._addInteraction([selectWalk]);
 };
 
+/**
+ * 清除所有图层
+ */
 Walkline.prototype.clearLayer = function () {
     this.walkLayer.getSource().clear();
     this.iconLayer.getSource().clear();
 };
 
+/**
+ * 获取 图标样式
+ * @param {Object} route 路径塑胶
+ * @returns {Array} 返回起始点和终止点的图标样式
+ * @private
+ */
 Walkline.prototype._getPasspoiStyle = function (route) {
     var passStyles = [];
     passStyles.push({
@@ -120,6 +154,11 @@ Walkline.prototype._getPasspoiStyle = function (route) {
     return passStyles;
 };
 
+/**
+ * 移动到当前选择的路段
+ * @param {Object} step 当前路段数据
+ * @private
+ */
 Walkline.prototype._moveTo = function (step) {
     var geometry = step.geometry;
     this._fly2Geometry(geometry);

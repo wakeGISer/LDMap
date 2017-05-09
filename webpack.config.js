@@ -2,7 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
-    entry: "./index",
+    entry: "./src/index",
     output: {
         path: path.join(__dirname, './dist'),
         // 文件地址，使用绝对路径形式
@@ -36,16 +36,14 @@ module.exports = {
             // for normal use cases only node_modules is needed
             exclude: /node_modules/,
             loader: 'babel-loader'
-        }
-        , {
+        }, {
             test: /\.css$/,
             use: [
                 'style-loader',
                 'css-loader',
                 'autoprefixer-loader'
             ]
-        }
-        , {
+        }, {
             test: /\.(png|jpg)$/,
             loader: 'url-loader?limit=10000&name=assets/img/[name].[ext]'
             // 添加到这！并且会按照文件大小, 或者转化为 base64, 或者单独作为文件
