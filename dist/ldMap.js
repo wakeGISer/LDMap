@@ -12343,9 +12343,9 @@ p.execute = function (identifyParams, callback) {
         _this.serviceUrl += item + "=" + json[item] + "&";
     });
     _index2.default.request(this.serviceUrl, function (data) {
-        if (data.results.error) {
+        if (data.error) {
             callback.call(null, data);
-            console.warn("error ： ", data.results.error);
+            console.warn("error ： ", data.error);
         } else {
             if (json.searchText != "") {
                 // 筛选出包含 key的数据
