@@ -10,14 +10,14 @@ export class DrawingManager {
         this.features = features;
     }
 
-    start (type, callback, style) {
-        if(!type) {
+    start(type, callback, style) {
+        if (!type) {
             return;
         }
-        if(style != void 0){
+        if (style != void 0) {
             switch (type) {
                 case "Point" :
-                    style =  new ol.style.Style({
+                    style = new ol.style.Style({
                         image: new ol.style.Circle({
                             radius: 5,
                             fill: new ol.style.Fill({
@@ -45,7 +45,8 @@ export class DrawingManager {
                         })
                     })
                     break;
-                default: break;
+                default:
+                    break;
             }
         }
 
@@ -56,14 +57,15 @@ export class DrawingManager {
         });
         this.draw.on("drawend", callback);
         this.map.addInteraction(this.draw);
+        this._isActive = true;
     }
 
-    end () {
-        if(!this._isActive){
+    end() {
+        if (!this._isActive) {
             return;
         }
         this._isActive = false;
-        if(this.draw) {
+        if (this.draw) {
             this.map.removeInteraction(this.draw);
         }
     }

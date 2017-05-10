@@ -4,18 +4,11 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="../../assets/css/ol.css">
-    <script src="../../src/ol3api/js/ol4-debug.js"></script>
+    <script src="../../dist/ol.js"></script>
 </head>
 <body>
-<form class="form-inline">
-    <label>几何类型 &nbsp;</label>
-    <select id="type">
-        <option value="Point">Point</option>
-        <option value="Polygon">Polygon</option>
-        <option value="Circle">Circle</option>
-    </select>
-</form>
-<button id="clear">取消</button>
+<input type="text" id="txt" value="">
+<button id="search">搜索</button>
 <div id="map"></div>
 <script src="../../dist/ldMap.js"></script>
 <script>
@@ -36,7 +29,7 @@
     })
 
     var map = new ol.Map({
-        layers: [raster,vector],
+        layers: [raster, vector],
         target: 'map',
         view: new ol.View({
             center: [115.18654030522777, 33.48505607105392],
@@ -44,21 +37,16 @@
             projection: 'EPSG:4326'
         })
     });
-
-    var service = new L.IdentifyServiceAGS(map, {
-        url : "http://27.17.60.13:6080/arcgis/rest/services/QUERY/MapServer",
-        layerIds: [0,1,2,3],
-        searchText: "蛋糕",
-        searchFields: ["ABBRE"]
-    });
-
-
-    var typeSelect = document.getElementById('type');
-    typeSelect.onchange = function() {
-        vector.getSource().clear();
-        service.clear();
-        service.start(typeSelect.value, function (json) {
-            vector.getSource().clear();
+    var txt = document.getElementById("txt");
+    var search = document.getElementById("search");
+    search.addEventListener("click", function () {
+        var val = txt.value;
+        var service = new L.FindServiceAGS(map, {
+            url: "http://27.17.60.13:6080/arcgis/rest/services/QUERY/MapServer",
+            layerIds: [0, 1, 2, 3],
+            searchText: val
+        });
+        service.search(function (json) {
             json.results.forEach(function (item) {
                 var feature = new ol.Feature({
                     geometry: new ol.geom.Point([item.geometry.x, item.geometry.y])
@@ -66,13 +54,7 @@
                 vector.getSource().addFeature(feature);
             })
             console.log(json);
-        });
-    };
-
-    var cancel = document.getElementById("clear");
-    cancel.addEventListener("click", function () {
-        service.clear();
-        vector.getSource().clear();
+        })
     })
 
 

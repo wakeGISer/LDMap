@@ -49,23 +49,30 @@ export class IdentifyServiceAGS {
         this.task = new IdentifyTask(this.opts.url);
     }
 
+    reset() {
+        this.IndentifyOverlay.setMap(this.map);
+    }
+
     /**
      * 开启地图上单机查询模式
      * @param callback
      */
     startPointIdentify(callback) {
         let draw = new DrawingManager(this.map, this.features);
+        this.draw = draw;
         var self = this;
-        draw.start("Point",function({feature, target, type}){
+        draw.start("Point", function ({feature, target, type}) {
             self._params.geometry = feature.getGeometry();
+            //self._params.mapExtent = feature.getGeometry().getExtent();
             self.task.execute(self._params, callback)
         });
     }
 
     startPolygonIdentify(callback) {
         let draw = new DrawingManager(this.map, this.features);
+        this.draw = draw;
         var self = this;
-        draw.start("Polygon",function({feature, target, type}){
+        draw.start("Polygon", function ({feature, target, type}) {
             self._params.geometry = feature.getGeometry();
             self.task.execute(self._params, callback)
         });
@@ -73,10 +80,31 @@ export class IdentifyServiceAGS {
 
     startCircleIdentify(callback) {
         let draw = new DrawingManager(this.map, this.features);
+        this.draw = draw;
         var self = this;
-        draw.start("Circle",function({feature, target, type}){
+        draw.start("Circle", function ({feature, target, type}) {
             self._params.geometry = feature.getGeometry();
             self.task.execute(self._params, callback)
         });
+    }
+
+    start(type, cb) {
+        this.reset();
+        switch (type) {
+            case "Point" :
+                this.startPointIdentify(cb);
+                break;
+            case "Circle" :
+                this.startCircleIdentify(cb);
+                break;
+            case "Polygon" :
+                this.startPolygonIdentify(cb);
+                break;
+        }
+    }
+
+    clear() {
+        this.draw  && this.draw.end();
+        this.IndentifyOverlay && this.IndentifyOverlay.getSource().clear() && this.IndentifyOverlay.setMap(null);
     }
 }

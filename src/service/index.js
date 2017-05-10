@@ -13,5 +13,6 @@ export default {
     FindParameters,
     IdentifyTask,
     IdentifyParameters,
-    IdentifyServiceAGS
+    IdentifyServiceAGS,
+    FindServiceAGS
 }

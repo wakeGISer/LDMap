@@ -25,9 +25,10 @@ p.toJson = function () {
     var geometry = this.geometry,
         extent = this.mapExtent,
         spatialRef = this.spatialReference;
+    var geometryString = JSON.stringify(this.toEsriGeometry(geometry))
     var result = {
         f: "json",
-        geometry: JSON.stringify(this.toEsriGeometry(geometry)),
+        geometry: geometryString,
         tolerance: this.tolerance,
         returnGeometry: this.returnGeometry,
         mapExtent: JSON.stringify(this.toEsriExtent(extent)),
@@ -56,6 +57,13 @@ p.toEsriGeometry = function (geometry) {
         case "Polygon" :
             return {
                 rings: esriJson.writeGeometryObject(geometry).rings,
+                spatialReference: {wkid: 4326}
+            };
+        case "Circle" :
+            this.tolerance = geometry.getRadius();
+            return {
+                x: geometry.getCenter()[0],
+                y: geometry.getCenter()[1],
                 spatialReference: {wkid: 4326}
             };
         default:

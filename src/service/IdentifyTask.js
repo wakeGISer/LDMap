@@ -12,13 +12,16 @@ function IdentifyTask(url,options) {
 var p = IdentifyTask.prototype;
 
 
+
+
 p.execute = function (identifyParams, callback) {
     var json  = identifyParams.toJson();
     var self = this;
+    var url = this.serviceUrl;
     Object.keys(json).forEach((item, i) => {
-        this.serviceUrl += item + "=" + json[item] + "&";
+        url += item + "=" + json[item] + "&";
     });
-    _.request(this.serviceUrl, function(data){
+    _.request(url, function(data){
         if(data.error){
             callback.call(null, data);
             console.warn("error ： ", data.error)

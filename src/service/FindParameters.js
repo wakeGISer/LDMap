@@ -6,7 +6,7 @@ function FindParameters() {
     this.layerIds = null;
     this.returnGeometry = !1;
     this.searchText = "";
-    this.searchFields = "";
+    this.searchFields = [];
     this.spatialReference = null;
     this.layers = null;
     this.contains = !0;

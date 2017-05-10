@@ -10749,7 +10749,8 @@ exports.default = {
     FindParameters: _FindParameters2.default,
     IdentifyTask: _IdentifyTask2.default,
     IdentifyParameters: _IdentifyParameters2.default,
-    IdentifyServiceAGS: _IdentifyService.IdentifyServiceAGS
+    IdentifyServiceAGS: _IdentifyService.IdentifyServiceAGS,
+    FindServiceAGS: _FindService.FindServiceAGS
 };
 
 /***/ }),
@@ -12122,7 +12123,7 @@ function FindParameters() {
     this.layerIds = null;
     this.returnGeometry = !1;
     this.searchText = "";
-    this.searchFields = "";
+    this.searchFields = [];
     this.spatialReference = null;
     this.layers = null;
     this.contains = !0;
@@ -12238,9 +12239,10 @@ p.toJson = function () {
     var geometry = this.geometry,
         extent = this.mapExtent,
         spatialRef = this.spatialReference;
+    var geometryString = (0, _stringify2.default)(this.toEsriGeometry(geometry));
     var result = {
         f: "json",
-        geometry: (0, _stringify2.default)(this.toEsriGeometry(geometry)),
+        geometry: geometryString,
         tolerance: this.tolerance,
         returnGeometry: this.returnGeometry,
         mapExtent: (0, _stringify2.default)(this.toEsriExtent(extent)),
@@ -12269,6 +12271,13 @@ p.toEsriGeometry = function (geometry) {
         case "Polygon":
             return {
                 rings: esriJson.writeGeometryObject(geometry).rings,
+                spatialReference: { wkid: 4326 }
+            };
+        case "Circle":
+            this.tolerance = geometry.getRadius();
+            return {
+                x: geometry.getCenter()[0],
+                y: geometry.getCenter()[1],
                 spatialReference: { wkid: 4326 }
             };
         default:
@@ -12340,14 +12349,13 @@ function IdentifyTask(url, options) {
 var p = IdentifyTask.prototype;
 
 p.execute = function (identifyParams, callback) {
-    var _this = this;
-
     var json = identifyParams.toJson();
     var self = this;
+    var url = this.serviceUrl;
     (0, _keys2.default)(json).forEach(function (item, i) {
-        _this.serviceUrl += item + "=" + json[item] + "&";
+        url += item + "=" + json[item] + "&";
     });
-    _lang2.default.request(this.serviceUrl, function (data) {
+    _lang2.default.request(url, function (data) {
         if (data.error) {
             callback.call(null, data);
             console.warn("error ： ", data.error);
@@ -33309,6 +33317,11 @@ var IdentifyServiceAGS = exports.IdentifyServiceAGS = function () {
             this._params.mapExtent = this.map.getView().calculateExtent(this.map.getSize());
             this.task = new _IdentifyTask2.default(this.opts.url);
         }
+    }, {
+        key: 'reset',
+        value: function reset() {
+            this.IndentifyOverlay.setMap(this.map);
+        }
 
         /**
          * 开启地图上单机查询模式
@@ -33319,6 +33332,7 @@ var IdentifyServiceAGS = exports.IdentifyServiceAGS = function () {
         key: 'startPointIdentify',
         value: function startPointIdentify(callback) {
             var draw = new _DrawingManager.DrawingManager(this.map, this.features);
+            this.draw = draw;
             var self = this;
             draw.start("Point", function (_ref) {
                 var feature = _ref.feature,
@@ -33326,6 +33340,7 @@ var IdentifyServiceAGS = exports.IdentifyServiceAGS = function () {
                     type = _ref.type;
 
                 self._params.geometry = feature.getGeometry();
+                //self._params.mapExtent = feature.getGeometry().getExtent();
                 self.task.execute(self._params, callback);
             });
         }
@@ -33333,6 +33348,7 @@ var IdentifyServiceAGS = exports.IdentifyServiceAGS = function () {
         key: 'startPolygonIdentify',
         value: function startPolygonIdentify(callback) {
             var draw = new _DrawingManager.DrawingManager(this.map, this.features);
+            this.draw = draw;
             var self = this;
             draw.start("Polygon", function (_ref2) {
                 var feature = _ref2.feature,
@@ -33347,6 +33363,7 @@ var IdentifyServiceAGS = exports.IdentifyServiceAGS = function () {
         key: 'startCircleIdentify',
         value: function startCircleIdentify(callback) {
             var draw = new _DrawingManager.DrawingManager(this.map, this.features);
+            this.draw = draw;
             var self = this;
             draw.start("Circle", function (_ref3) {
                 var feature = _ref3.feature,
@@ -33356,6 +33373,28 @@ var IdentifyServiceAGS = exports.IdentifyServiceAGS = function () {
                 self._params.geometry = feature.getGeometry();
                 self.task.execute(self._params, callback);
             });
+        }
+    }, {
+        key: 'start',
+        value: function start(type, cb) {
+            this.reset();
+            switch (type) {
+                case "Point":
+                    this.startPointIdentify(cb);
+                    break;
+                case "Circle":
+                    this.startCircleIdentify(cb);
+                    break;
+                case "Polygon":
+                    this.startPolygonIdentify(cb);
+                    break;
+            }
+        }
+    }, {
+        key: 'clear',
+        value: function clear() {
+            this.draw && this.draw.end();
+            this.IndentifyOverlay && this.IndentifyOverlay.getSource().clear() && this.IndentifyOverlay.setMap(null);
         }
     }]);
     return IdentifyServiceAGS;
@@ -33448,6 +33487,7 @@ var DrawingManager = exports.DrawingManager = function () {
             });
             this.draw.on("drawend", callback);
             this.map.addInteraction(this.draw);
+            this._isActive = true;
         }
     }, {
         key: "end",
@@ -33571,9 +33611,25 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.FindServiceAGS = undefined;
 
+var _assign = __webpack_require__(69);
+
+var _assign2 = _interopRequireDefault(_assign);
+
 var _classCallCheck2 = __webpack_require__(139);
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(140);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _FindParameters = __webpack_require__(61);
+
+var _FindParameters2 = _interopRequireDefault(_FindParameters);
+
+var _FindTask = __webpack_require__(62);
+
+var _FindTask2 = _interopRequireDefault(_FindTask);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -33581,9 +33637,36 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Created by Administrator on 2017/5/10/010.
  */
 
-var FindServiceAGS = exports.FindServiceAGS = function FindServiceAGS() {
-    (0, _classCallCheck3.default)(this, FindServiceAGS);
-};
+var FindServiceAGS = exports.FindServiceAGS = function () {
+    function FindServiceAGS(map, opts) {
+        (0, _classCallCheck3.default)(this, FindServiceAGS);
+
+        this.opts = {
+            returnGeometry: !0,
+            outSpatialReference: 4326
+        };
+        (0, _assign2.default)(this.opts, opts);
+        // this.cb = cb;
+        this.map = map;
+        this.initialize();
+    }
+
+    (0, _createClass3.default)(FindServiceAGS, [{
+        key: 'initialize',
+        value: function initialize() {
+            var params = new _FindParameters2.default();
+            (0, _assign2.default)(params, this.opts);
+            this._params = params;
+            this.task = new _FindTask2.default(this.opts.url);
+        }
+    }, {
+        key: 'search',
+        value: function search(cb) {
+            this.task.execute(this._params, cb);
+        }
+    }]);
+    return FindServiceAGS;
+}();
 
 /***/ })
 /******/ ]);
