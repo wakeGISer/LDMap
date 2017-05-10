@@ -1,7 +1,7 @@
 /**
  * Created by Administrator on 2017/5/8/008.
  */
-import _  from '../common/index';
+import _  from '../common/lang';
 
 
 function IdentifyTask(url,options) {
@@ -30,7 +30,7 @@ p.execute = function (identifyParams, callback) {
                     let a = data.results;
                     a = a.filter(item => {
                         for(let i = 0 ; i < json.searchFields.length; i++){
-                            let flag = item.attributes[json.searchFields[i]] && item.attributes[json.searchFields[i]].includes(json.searchText);
+                            let flag = item.attributes[json.searchFields[i]].includes(json.searchText);
                             if(flag === true){
                                 return true;
                             }else {

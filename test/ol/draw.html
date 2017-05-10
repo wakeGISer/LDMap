@@ -33,8 +33,11 @@
     });
 
     var features = new ol.Collection();
+    var source = new ol.source.Vector({features: features});
+//    source.addFeatures(features)
+
     var featureOverlay = new ol.layer.Vector({
-        source: new ol.source.Vector({features: features}),
+        source: source,
         style: new ol.style.Style({
             fill: new ol.style.Fill({
                 color: 'rgba(255, 255, 255, 0.2)'
@@ -44,7 +47,7 @@
                 width: 2
             }),
             image: new ol.style.Circle({
-                radius: 7,
+                radius: 5,
                 fill: new ol.style.Fill({
                     color: '#ffcc33'
                 })
@@ -69,6 +72,7 @@
     var typeSelect = document.getElementById('type');
 
     function addInteraction() {
+
         draw = new ol.interaction.Draw({
             features: features,
             type: /** @type {ol.geom.GeometryType} */ (typeSelect.value)

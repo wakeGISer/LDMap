@@ -4,8 +4,10 @@
 
 import lang from './lang';
 import  dom from './dom';
+import options from './options';
 
 export default {
     ...lang,
-    ...dom
+    ...dom,
+    ...options
 }

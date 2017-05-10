@@ -10735,6 +10735,10 @@ var _IdentifyParameters = __webpack_require__(63);
 
 var _IdentifyParameters2 = _interopRequireDefault(_IdentifyParameters);
 
+var _IdentifyService = __webpack_require__(136);
+
+var _FindService = __webpack_require__(144);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -10744,7 +10748,8 @@ exports.default = {
     FindTask: _FindTask2.default,
     FindParameters: _FindParameters2.default,
     IdentifyTask: _IdentifyTask2.default,
-    IdentifyParameters: _IdentifyParameters2.default
+    IdentifyParameters: _IdentifyParameters2.default,
+    IdentifyServiceAGS: _IdentifyService.IdentifyServiceAGS
 };
 
 /***/ }),
@@ -12318,9 +12323,9 @@ var _keys = __webpack_require__(29);
 
 var _keys2 = _interopRequireDefault(_keys);
 
-var _index = __webpack_require__(134);
+var _lang = __webpack_require__(133);
 
-var _index2 = _interopRequireDefault(_index);
+var _lang2 = _interopRequireDefault(_lang);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -12342,7 +12347,7 @@ p.execute = function (identifyParams, callback) {
     (0, _keys2.default)(json).forEach(function (item, i) {
         _this.serviceUrl += item + "=" + json[item] + "&";
     });
-    _index2.default.request(this.serviceUrl, function (data) {
+    _lang2.default.request(this.serviceUrl, function (data) {
         if (data.error) {
             callback.call(null, data);
             console.warn("error ： ", data.error);
@@ -12354,7 +12359,7 @@ p.execute = function (identifyParams, callback) {
                     var _a = data.results;
                     _a = _a.filter(function (item) {
                         for (var i = 0; i < json.searchFields.length; i++) {
-                            var flag = item.attributes[json.searchFields[i]] && item.attributes[json.searchFields[i]].includes(json.searchText);
+                            var flag = item.attributes[json.searchFields[i]].includes(json.searchText);
                             if (flag === true) {
                                 return true;
                             } else {
@@ -33163,7 +33168,7 @@ exports.default = {
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
 
 var _extends2 = __webpack_require__(27);
@@ -33178,13 +33183,15 @@ var _dom = __webpack_require__(59);
 
 var _dom2 = _interopRequireDefault(_dom);
 
+var _options = __webpack_require__(143);
+
+var _options2 = _interopRequireDefault(_options);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Created by wake on 2017/5/9/009.
- */
-
-exports.default = (0, _extends3.default)({}, _lang2.default, _dom2.default);
+exports.default = (0, _extends3.default)({}, _lang2.default, _dom2.default, _options2.default); /**
+                                                                                                 * Created by wake on 2017/5/9/009.
+                                                                                                 */
 
 /***/ }),
 /* 135 */
@@ -33218,6 +33225,365 @@ exports.default = {
 }; /**
     * Created by Administrator on 2017/5/9/009.
     */
+
+/***/ }),
+/* 136 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.IdentifyServiceAGS = undefined;
+
+var _assign = __webpack_require__(69);
+
+var _assign2 = _interopRequireDefault(_assign);
+
+var _classCallCheck2 = __webpack_require__(139);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(140);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _DrawingManager = __webpack_require__(137);
+
+var _IdentifyParameters = __webpack_require__(63);
+
+var _IdentifyParameters2 = _interopRequireDefault(_IdentifyParameters);
+
+var _IdentifyTask = __webpack_require__(64);
+
+var _IdentifyTask2 = _interopRequireDefault(_IdentifyTask);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var IdentifyServiceAGS = exports.IdentifyServiceAGS = function () {
+    function IdentifyServiceAGS(map, opts) {
+        (0, _classCallCheck3.default)(this, IdentifyServiceAGS);
+
+        this.opts = {
+            returnGeometry: !0,
+            tolerance: 0,
+            spatialReference: 4326
+        };
+        (0, _assign2.default)(this.opts, opts);
+        // this.cb = cb;
+        this.map = map;
+        this.features = new ol.Collection();
+        this.source = new ol.source.Vector({
+            features: this.features
+        });
+        this.IndentifyOverlay = new ol.layer.Vector({
+            source: this.source,
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 255, 255, 0.2)'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#ffcc33',
+                    width: 2
+                }),
+                image: new ol.style.Circle({
+                    radius: 5,
+                    fill: new ol.style.Fill({
+                        color: '#ffcc33'
+                    })
+                })
+            })
+        });
+        this.IndentifyOverlay.setMap(this.map);
+        this.initialize();
+    }
+
+    (0, _createClass3.default)(IdentifyServiceAGS, [{
+        key: 'initialize',
+        value: function initialize() {
+            var params = new _IdentifyParameters2.default();
+            (0, _assign2.default)(params, this.opts);
+            this._params = params;
+            this._params.mapExtent = this.map.getView().calculateExtent(this.map.getSize());
+            this.task = new _IdentifyTask2.default(this.opts.url);
+        }
+
+        /**
+         * 开启地图上单机查询模式
+         * @param callback
+         */
+
+    }, {
+        key: 'startPointIdentify',
+        value: function startPointIdentify(callback) {
+            var draw = new _DrawingManager.DrawingManager(this.map, this.features);
+            var self = this;
+            draw.start("Point", function (_ref) {
+                var feature = _ref.feature,
+                    target = _ref.target,
+                    type = _ref.type;
+
+                self._params.geometry = feature.getGeometry();
+                self.task.execute(self._params, callback);
+            });
+        }
+    }, {
+        key: 'startPolygonIdentify',
+        value: function startPolygonIdentify(callback) {
+            var draw = new _DrawingManager.DrawingManager(this.map, this.features);
+            var self = this;
+            draw.start("Polygon", function (_ref2) {
+                var feature = _ref2.feature,
+                    target = _ref2.target,
+                    type = _ref2.type;
+
+                self._params.geometry = feature.getGeometry();
+                self.task.execute(self._params, callback);
+            });
+        }
+    }, {
+        key: 'startCircleIdentify',
+        value: function startCircleIdentify(callback) {
+            var draw = new _DrawingManager.DrawingManager(this.map, this.features);
+            var self = this;
+            draw.start("Circle", function (_ref3) {
+                var feature = _ref3.feature,
+                    target = _ref3.target,
+                    type = _ref3.type;
+
+                self._params.geometry = feature.getGeometry();
+                self.task.execute(self._params, callback);
+            });
+        }
+    }]);
+    return IdentifyServiceAGS;
+}(); /**
+      * Created by Administrator on 2017/5/8/008.
+      */
+
+/***/ }),
+/* 137 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.DrawingManager = undefined;
+
+var _classCallCheck2 = __webpack_require__(139);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = __webpack_require__(140);
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by Administrator on 2017/5/9/009.
+ */
+
+var DrawingManager = exports.DrawingManager = function () {
+    function DrawingManager(map, features) {
+        (0, _classCallCheck3.default)(this, DrawingManager);
+
+        this.map = map;
+        this._isActive = false;
+        this.draw = null;
+        this.features = features;
+    }
+
+    (0, _createClass3.default)(DrawingManager, [{
+        key: "start",
+        value: function start(type, callback, style) {
+            if (!type) {
+                return;
+            }
+            if (style != void 0) {
+                switch (type) {
+                    case "Point":
+                        style = new ol.style.Style({
+                            image: new ol.style.Circle({
+                                radius: 5,
+                                fill: new ol.style.Fill({
+                                    color: '#ffcc33'
+                                })
+                            })
+                        });
+                        break;
+                    case "LineString":
+                        style = new ol.style.Style({
+                            stroke: new ol.style.Stroke({
+                                color: '#ffcc33',
+                                width: 2
+                            })
+                        });
+                        break;
+                    case "Polygon":
+                        style = new ol.style.Style({
+                            fill: new ol.style.Fill({
+                                color: 'rgba(255, 255, 255, 0.2)'
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: '#ffcc33',
+                                width: 2
+                            })
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            this.draw = new ol.interaction.Draw({
+                type: type,
+                features: this.features,
+                style: style
+            });
+            this.draw.on("drawend", callback);
+            this.map.addInteraction(this.draw);
+        }
+    }, {
+        key: "end",
+        value: function end() {
+            if (!this._isActive) {
+                return;
+            }
+            this._isActive = false;
+            if (this.draw) {
+                this.map.removeInteraction(this.draw);
+            }
+        }
+    }]);
+    return DrawingManager;
+}();
+
+/***/ }),
+/* 138 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = { "default": __webpack_require__(141), __esModule: true };
+
+/***/ }),
+/* 139 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+exports.default = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+/***/ }),
+/* 140 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.__esModule = true;
+
+var _defineProperty = __webpack_require__(138);
+
+var _defineProperty2 = _interopRequireDefault(_defineProperty);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      (0, _defineProperty2.default)(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+/***/ }),
+/* 141 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(142);
+var $Object = __webpack_require__(0).Object;
+module.exports = function defineProperty(it, key, desc){
+  return $Object.defineProperty(it, key, desc);
+};
+
+/***/ }),
+/* 142 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var $export = __webpack_require__(10);
+// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
+$export($export.S + $export.F * !__webpack_require__(9), 'Object', {defineProperty: __webpack_require__(20).f});
+
+/***/ }),
+/* 143 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _assign = __webpack_require__(69);
+
+var _assign2 = _interopRequireDefault(_assign);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = {
+    mergeOptions: function mergeOptions(to, from) {
+        return (0, _assign2.default)({}, to, from);
+    }
+};
+
+/***/ }),
+/* 144 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.FindServiceAGS = undefined;
+
+var _classCallCheck2 = __webpack_require__(139);
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Created by Administrator on 2017/5/10/010.
+ */
+
+var FindServiceAGS = exports.FindServiceAGS = function FindServiceAGS() {
+    (0, _classCallCheck3.default)(this, FindServiceAGS);
+};
 
 /***/ })
 /******/ ]);
