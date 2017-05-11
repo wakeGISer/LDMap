@@ -14,12 +14,11 @@ var p = FindTask.prototype;
 p.execute = function (findParameters, callback) {
     var json = findParameters.toJson();
     var self = this;
+    var url = this.serviceUrl;
     Object.keys(json).forEach((item, i) => {
-        this.serviceUrl += item + "=" + json[item] + "&";
+        url += item + "=" + json[item] + "&";
     });
-    _.request(this.serviceUrl, function(data){
-         callback.call(null, data);
-    });
+    _.request(url, callback);
 
 };
 

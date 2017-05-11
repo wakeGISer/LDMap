@@ -23,20 +23,10 @@
         source: new ol.source.OSM()
     });
 
-    var vector =  new ol.layer.Vector({
-        source: new ol.source.Vector(),
-        style: new ol.style.Style({
-            image: new ol.style.Circle({
-                radius: 5,
-                fill: new ol.style.Fill({
-                    color: "#0099ff"
-                })
-            })
-        })
-    })
+
 
     var map = new ol.Map({
-        layers: [raster,vector],
+        layers: [raster],
         target: 'map',
         view: new ol.View({
             center: [115.18654030522777, 33.48505607105392],
@@ -47,32 +37,21 @@
 
     var service = new L.IdentifyServiceAGS(map, {
         url : "http://27.17.60.13:6080/arcgis/rest/services/QUERY/MapServer",
-        layerIds: [0,1,2,3],
-        searchText: "蛋糕",
-        searchFields: ["ABBRE"]
+        layerIds: [0,1,2,3]
     });
 
 
     var typeSelect = document.getElementById('type');
     typeSelect.onchange = function() {
-        vector.getSource().clear();
         service.clear();
-        service.start(typeSelect.value, function (json) {
-            vector.getSource().clear();
-            json.results.forEach(function (item) {
-                var feature = new ol.Feature({
-                    geometry: new ol.geom.Point([item.geometry.x, item.geometry.y])
-                })
-                vector.getSource().addFeature(feature);
-            })
-            console.log(json);
-        });
+        service.set("searchText", "蛋糕");
+        service.set("searchFields", ["ABBRE"]);
+        service.start(typeSelect.value);
     };
 
     var cancel = document.getElementById("clear");
     cancel.addEventListener("click", function () {
         service.clear();
-        vector.getSource().clear();
     })
 
 

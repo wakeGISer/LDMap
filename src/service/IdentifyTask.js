@@ -23,7 +23,7 @@ p.execute = function (identifyParams, callback) {
     });
     _.request(url, function(data){
         if(data.error){
-            callback.call(null, data);
+            callback(data);
             console.warn("error ： ", data.error)
         }else {
             if(json.searchText != ""){
@@ -41,16 +41,16 @@ p.execute = function (identifyParams, callback) {
                             }
                         }
                     })
-                    callback.call(null, {results: a});
+                    callback({results: a});
                 }else {
                     var a =  data.results;
                     a = a.filter(item => {
                         return item.value.includes(json.searchText);
                     });
-                    callback.call(null, {results: a});
+                    callback({results: a});
                 }
             }else {
-                callback.call(null, data);
+                callback(data);
             }
         }
     });
