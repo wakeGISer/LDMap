@@ -60,10 +60,13 @@ p.toEsriGeometry = function (geometry) {
                 spatialReference: {wkid: 4326}
             };
         case "Circle" :
-            this.tolerance = geometry.getRadius();
+            // var radius = geometry.getRadius(),
+            //     sphere = new ol.Sphere(6378137),
+            //     center = geometry.getCenter();
+            // var polygon = ol.geom.Polygon.circular(sphere, center, radius,16);
+            var polygon = ol.geom.Polygon.fromCircle(geometry);
             return {
-                x: geometry.getCenter()[0],
-                y: geometry.getCenter()[1],
+                rings: esriJson.writeGeometryObject(polygon).rings,
                 spatialReference: {wkid: 4326}
             };
         default:
@@ -91,6 +94,8 @@ p.getGeometryType = function (geometry) {
         case "Point" :
             return "esriGeometryPoint";
         case "Polygon" :
+            return "esriGeometryPolygon";
+        case "Circle" :
             return "esriGeometryPolygon";
         default:
             break;

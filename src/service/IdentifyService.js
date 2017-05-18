@@ -102,6 +102,12 @@ export class IdentifyServiceAGS {
         var self = this;
         draw.start("Circle", function ({feature, target, type}) {
             self._params.geometry = feature.getGeometry();
+            // var view = self.map.getView();
+            // var resolution  = view.getResolution();
+            // var radius = self._params.geometry.getRadius();
+            // var pixel = parseInt(radius / resolution);
+            // self._params.tolerance = pixel;
+            self._params.mapExtent = self.map.getView().calculateExtent(self.map.getSize());
             self.task.execute(self._params, callback)
         });
     }
